@@ -8,5 +8,5 @@ export default {
   dbCredentials: {
     url: env.DATABASE_URL,
   },
-  tablesFilter: ["aegile-t3_*"],
+  tablesFilter: ["t3aegile_*"],
 } satisfies Config;
