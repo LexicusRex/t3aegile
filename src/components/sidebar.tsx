@@ -29,7 +29,7 @@ const UserDetails = ({ session }: { session: Session }) => {
   if (session === null) return null;
   const user = session.user;
 
-  if (!user?.name || user.name.length == 0) return null;
+  if (!user?.name || user.name.length === 0) return null;
 
   return (
     <Link href="/account">
