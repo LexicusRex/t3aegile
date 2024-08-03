@@ -5,8 +5,13 @@ import { usePathname } from "next/navigation";
 
 import type { LucideIcon } from "lucide-react";
 
-import { additionalLinks, defaultLinks } from "@/config/nav";
+import { additionalLinks, defaultLinks, footerLinks } from "@/config/nav";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export interface SidebarLink {
   title: string;
@@ -14,7 +19,7 @@ export interface SidebarLink {
   icon: LucideIcon;
 }
 
-const SidebarItems = () => {
+export const SidebarItems = () => {
   return (
     <>
       <SidebarLinkGroup links={defaultLinks} />
@@ -22,7 +27,7 @@ const SidebarItems = () => {
         ? additionalLinks.map((l) => (
             <SidebarLinkGroup
               links={l.links}
-              title={l.title}
+              // title={l.title}
               border
               key={l.title}
             />
@@ -31,7 +36,10 @@ const SidebarItems = () => {
     </>
   );
 };
-export default SidebarItems;
+
+export const SidebarFooter = () => {
+  return <SidebarLinkGroup links={footerLinks} />;
+};
 
 const SidebarLinkGroup = ({
   links,
@@ -52,13 +60,15 @@ const SidebarLinkGroup = ({
           {title}
         </h4>
       ) : null}
-      <ul>
+      <div className="flex flex-col gap-4">
         {links.map((link) => (
-          <li key={link.title}>
-            <SidebarLink link={link} active={pathname === link.href} />
-          </li>
+          <SidebarLink
+            key={link.title}
+            link={link}
+            active={pathname === link.href}
+          />
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
@@ -70,22 +80,48 @@ const SidebarLink = ({
   active: boolean;
 }) => {
   return (
-    <Link
-      href={link.href}
-      className={`group inline-block w-full rounded-md p-2 text-xs text-muted-foreground transition-colors hover:bg-popover hover:text-primary hover:shadow ${
-        active ? "font-semibold text-primary" : ""
-      }`}
-    >
-      <div className="flex items-center">
-        <div
-          className={cn(
-            "absolute left-0 h-6 w-[4px] rounded-r-lg bg-primary opacity-0",
-            active ? "opacity-100" : "",
-          )}
-        />
-        <link.icon className="mr-1 h-3.5" />
-        <span>{link.title}</span>
-      </div>
-    </Link>
+    <Tooltip key={"navbar-" + link.title.toLowerCase()}>
+      <TooltipTrigger asChild>
+        <Link
+          href={link.href}
+          className={`flex h-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 ${
+            // active ? "font-semibold text-primary" : ""
+            active ? "bg-accent text-accent-foreground" : ""
+          }`}
+        >
+          <div className="flex items-center justify-start">
+            <div
+              className={cn(
+                "absolute left-0 h-9 w-[4px] rounded-r-lg bg-primary opacity-0",
+                active ? "opacity-100" : "",
+              )}
+            />
+            <link.icon className="h-5 w-5" />
+            {/* <span className="ml-2 mr-2 text-sm">{link.title}</span> */}
+          </div>
+        </Link>
+      </TooltipTrigger>
+      <TooltipContent side="right">{link.title}</TooltipContent>
+    </Tooltip>
   );
+
+  // return (
+  //   <Link
+  //     href={link.href}
+  //     className={`group inline-block w-full rounded-md p-2 text-xs text-muted-foreground transition-colors hover:bg-popover hover:text-primary hover:shadow ${
+  //       active ? "font-semibold text-primary" : ""
+  //     }`}
+  //   >
+  //     <div className="flex items-center">
+  //       <div
+  //         className={cn(
+  //           "absolute left-0 h-6 w-[4px] rounded-r-lg bg-primary opacity-0",
+  //           active ? "opacity-100" : "",
+  //         )}
+  //       />
+  //       <link.icon className="mr-1 h-3.5" />
+  //       <span>{link.title}</span>
+  //     </div>
+  //   </Link>
+  // );
 };
