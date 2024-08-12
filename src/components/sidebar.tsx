@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import LogoOutline from "@/components/aegile/logo";
+import LogoOutline from "@/components/aegile/logo-outline";
 
 import { SidebarFooter, SidebarItems } from "./sidebar-items";
 import { Avatar, AvatarFallback } from "./ui/avatar";
