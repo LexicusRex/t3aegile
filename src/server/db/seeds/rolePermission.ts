@@ -27,13 +27,13 @@ export default async function seed(db: db) {
         console.error(`Permission not found: ${perm}`);
         continue;
       }
-      permissionIds.push(foundPermission.id);
+      permissionIds.push(foundPermission.slug);
     }
 
     // Insert role-permission relationships into the database
-    const rolePermissionsToInsert = permissionIds.map((permissionId) => ({
+    const rolePermissionsToInsert = permissionIds.map((permission) => ({
       roleId: foundRole.id,
-      permissionId,
+      permission,
     }));
 
     await db.insert(rolePermissions).values(rolePermissionsToInsert);

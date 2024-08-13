@@ -1,6 +1,6 @@
 [
   {
     "role": "23T3_COMP1511_Instructor",
-    "permissions": ["course:view_external", "tutorial:manage_enrolments"]
+    "permissions": ["course:view", "tutorial:manage_enrolments"]
   }
 ]
