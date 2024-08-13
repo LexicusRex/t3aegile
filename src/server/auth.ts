@@ -4,11 +4,15 @@ import { redirect } from "next/navigation";
 import { db } from "@/server/db";
 import {
   accounts,
+  courseEnrolments,
+  permissions,
+  rolePermissions,
   sessions,
   users,
   verificationTokens,
 } from "@/server/db/schema";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { and, eq } from "drizzle-orm";
 import {
   getServerSession,
   type DefaultSession,
@@ -33,13 +37,15 @@ declare module "next-auth" {
       id: string;
       // ...other properties
       // role: UserRole;
+      isSuperuser: boolean;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    // ...other properties
+    // role: UserRole;
+    isSuperuser: boolean;
+  }
 }
 
 /**
@@ -54,6 +60,7 @@ export const authOptions: NextAuthOptions = {
       user: {
         ...session.user,
         id: user.id,
+        isSuperuser: user.isSuperuser,
       },
     }),
   },
@@ -119,3 +126,42 @@ export const testCall = async () => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return { "course:create": true };
 };
+
+export const hasCoursePermission = async (
+  userId: string,
+  courseId: string,
+  permissionSlug: string,
+) => {
+  const prepared = db
+    .select()
+    .from(courseEnrolments)
+    .where(
+      and(
+        eq(courseEnrolments.userId, userId),
+        eq(courseEnrolments.courseId, courseId),
+      ),
+    )
+    // .leftJoin(
+    .innerJoin(
+      rolePermissions,
+      and(
+        eq(courseEnrolments.roleId, rolePermissions.roleId),
+        eq(rolePermissions.permission, permissionSlug),
+      ),
+    );
+  // .innerJoin(
+  //   permissions,
+  //   and(
+  //     eq(rolePermissions.permissionId, permissions.id),
+  //     eq(permissions.slug, permissionSlug),
+  //   ),
+  // );
+
+  const result = await prepared.execute();
+  return result.length > 0;
+};
+
+export const checkCoursePermission = cache(
+  async (userId: string, courseId: string, permissionSlug: string) =>
+    await hasCoursePermission(userId, courseId, permissionSlug),
+);
