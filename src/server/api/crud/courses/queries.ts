@@ -1,12 +1,12 @@
 import { db } from "@/server/db/index";
 import { courseEnrolments } from "@/server/db/schema";
-import type { UserId } from "@/server/db/schema/auth";
+import { userIdSchema, type UserId } from "@/server/db/schema/auth";
 import {
   courseIdSchema,
   courses,
   type CourseId,
 } from "@/server/db/schema/course";
-import { eq } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 
 export const getCourses = async () => {
   const rows = await db.select().from(courses);
@@ -22,13 +22,34 @@ export const getCourseById = async (id: CourseId) => {
   return { course: c };
 };
 
-export const getCoursesByEnrolment = async (id: UserId) => {
-  const { id: userId } = courseIdSchema.parse({ id });
+export const getCoursesByEnrolment = async (id: string) => {
+  const { id: userId } = userIdSchema.parse({ id });
   const rows = await db
-    .select()
+    .select({ ...getTableColumns(courses) })
     .from(courses)
     .innerJoin(courseEnrolments, eq(courseEnrolments.courseId, courses.id))
     .where(eq(courseEnrolments.userId, userId));
   const c = rows;
   return { courses: c };
+};
+
+export const checkCourseEnrolment = async (
+  userId: string,
+  courseId: string,
+) => {
+  // const { id: _userId } = userIdSchema.parse({ userId });
+  // const { id: _courseId } = courseIdSchema.parse({ courseId });
+
+  const prepared = db
+    .select()
+    .from(courseEnrolments)
+    .where(
+      and(
+        eq(courseEnrolments.userId, userId),
+        eq(courseEnrolments.courseId, courseId),
+      ),
+    );
+
+  const result = await prepared.execute();
+  return result.length > 0;
 };
