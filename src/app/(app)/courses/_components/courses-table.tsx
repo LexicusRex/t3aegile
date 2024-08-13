@@ -24,6 +24,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import CourseForm from "./course-form";
+
 export default function CoursesTable({
   courses,
 }: {
@@ -157,7 +159,7 @@ const CourseCreationDialog = () => {
             Create a new course. Click submit when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
-        {/* <CourseCreationForm /> */}
+        <CourseForm />
       </DialogContent>
     </Dialog>
   );
