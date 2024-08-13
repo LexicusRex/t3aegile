@@ -1,6 +1,11 @@
 import { Suspense } from "react";
+import { redirect } from "next/dist/server/api-utils";
 
-import { getCourses } from "@/server/api/crud/courses/queries";
+import {
+  getCourses,
+  getCoursesByEnrolment,
+} from "@/server/api/crud/courses/queries";
+import { getServerAuthSession } from "@/server/auth";
 
 import Loading from "../loading";
 import CoursesTable from "./_components/courses-table";
@@ -23,7 +28,16 @@ export default async function CoursesPage() {
 }
 
 const Courses = async () => {
-  const { courses } = await getCourses();
+  const session = await getServerAuthSession();
+  if (!session) return null;
+  console.log(
+    "🚀 ~ Courses ~ session?.user.isSuperuser:",
+    session?.user.isSuperuser,
+  );
+
+  const { courses } = session?.user.isSuperuser
+    ? await getCourses()
+    : await getCoursesByEnrolment(session?.user.id);
   // console.log("🚀 ~ Courses ~ courses:", courses);
   return (
     <Suspense fallback={<Loading />}>

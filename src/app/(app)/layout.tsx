@@ -36,7 +36,7 @@ export default async function AppLayout({
         <div className="flex h-screen">
           <Sidebar />
           {/* <main className="flex-1 overflow-y-auto p-8 pt-2 md:p-8"> */}
-          <div className="flex-1 overflow-y-auto border border-blue-500 sm:pt-4">
+          <div className="flex flex-1 flex-col overflow-y-auto sm:pt-4">
             {/* <Navbar /> */}
             <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
               {/* <NavBarMobile /> */}
@@ -75,7 +75,9 @@ export default async function AppLayout({
                 </DropdownMenuContent>
               </DropdownMenu>
             </header>
-            <main className="flex-1 overflow-y-auto pt-2">{children}</main>
+            <main className="flex flex-1 flex-col overflow-y-auto pt-2">
+              {children}
+            </main>
           </div>
         </div>
 
