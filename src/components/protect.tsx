@@ -37,7 +37,13 @@ export default async function Protect({
   // !session.user.isSuperuser && !hasPermission && !isMember -> fail
   // !session.user.isSuperuser && hasPermission && !isMember -> pass
   // session.user.isSuperuser && !hasPermission && !isMember -> pass
-
+  // console.log("🚀 ~ session.user.isSuperuser:", session.user.isSuperuser);
+  // console.log("🚀 ~ hasPermission:", hasPermission);
+  // console.log("🚀 ~ isMember:", isMember);
+  // console.log(
+  //   "🚀 ~ isBlocked:",
+  //   !session.user.isSuperuser && !hasPermission && !isMember,
+  // );
   if (!session.user.isSuperuser && !hasPermission && !isMember) {
     return hidden ? null : <ErrorForbiddenGraphic />;
   }

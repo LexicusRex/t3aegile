@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 export default function ErrorUnauthorizedGraphic() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center space-y-4">
-      <p className="max-w-[500px] text-pretty text-center text-3xl font-light sm:text-4xl">
+      {/* <p className="max-w-[500px] text-pretty text-center text-3xl font-light sm:text-4xl">
         you are unauthenticated
-      </p>
+      </p> */}
       <div className="flex flex-col items-center">
         <Image
           src="/401-error-unauthorized.svg"
@@ -17,9 +17,9 @@ export default function ErrorUnauthorizedGraphic() {
           alt="404 Error Unauthorized"
         />
         <Button variant="link" asChild>
-          <Link href="https://storyset.com/web">
+          <a href="https://storyset.com/web" target="_blank">
             Web illustrations by Storyset
-          </Link>
+          </a>
         </Button>
       </div>
     </div>
