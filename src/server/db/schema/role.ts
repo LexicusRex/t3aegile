@@ -1,8 +1,12 @@
 import { relations, sql } from "drizzle-orm";
-import { index, primaryKey, timestamp, varchar } from "drizzle-orm/pg-core";
+import { index, timestamp, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+
+import { timestamps } from "@/lib/utils";
 
 import { ID_LENGTH } from "./config";
-import { permissions } from "./permission";
+import { rolePermissions } from "./rolePermissions";
 import { createTable, generateId } from "./util";
 
 export const roles = createTable(
@@ -32,40 +36,48 @@ export const roleRelations = relations(roles, ({ many }) => ({
   permissions: many(rolePermissions),
 }));
 
-export const rolePermissions = createTable(
-  "role_to_permission",
-  {
-    roleId: varchar("role_id", { length: ID_LENGTH })
-      .notNull()
-      .references(() => roles.id, {
-        onUpdate: "no action",
-        onDelete: "cascade",
-      }),
-    permissionId: varchar("permission_id", { length: ID_LENGTH })
-      .notNull()
-      .references(() => permissions.id, {
-        onUpdate: "no action",
-        onDelete: "cascade",
-      }),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.roleId, t.permissionId] }),
-  }),
-);
+// Base schema for roles - used to validate API requests
+const baseRoleSchema = createSelectSchema(roles).omit(timestamps);
 
-export const roleToPermissionRelations = relations(
-  rolePermissions,
-  ({ one }) => ({
-    role: one(roles, {
-      fields: [rolePermissions.roleId],
-      references: [roles.id],
+// Schema for inserting a new role
+export const insertRoleSchema = createInsertSchema(roles).omit(timestamps);
+export const insertRoleParams = baseRoleSchema
+  .extend({
+    name: z.string().min(1, { message: "Role name is required." }).max(255, {
+      message: "Role name must not exceed 255 characters.",
     }),
-    permission: one(permissions, {
-      fields: [rolePermissions.permissionId],
-      references: [permissions.id],
-    }),
+    displayName: z
+      .string()
+      .min(1, { message: "Display name is required." })
+      .max(255, {
+        message: "Display name must not exceed 255 characters.",
+      }),
+  })
+  .omit({
+    id: true,
+  });
+
+// Schema for updating a role
+export const updateRoleSchema = baseRoleSchema;
+export const updateRoleParams = baseRoleSchema.extend({
+  name: z.string().min(1, { message: "Role name is required." }).max(255, {
+    message: "Role name must not exceed 255 characters.",
   }),
-);
+  displayName: z
+    .string()
+    .min(1, { message: "Display name is required." })
+    .max(255, {
+      message: "Display name must not exceed 255 characters.",
+    }),
+});
+export const roleIdSchema = baseRoleSchema.pick({ id: true });
+
+// Types for roles - used to type API request params and within Components
+export type Role = typeof roles.$inferSelect;
+export type NewRole = z.infer<typeof insertRoleSchema>;
+export type NewRoleParams = z.infer<typeof insertRoleParams>;
+export type UpdateRoleParams = z.infer<typeof updateRoleParams>;
+export type RoleId = z.infer<typeof roleIdSchema>["id"];
 
 // db.query.role.findMany({
 //   columns: {
