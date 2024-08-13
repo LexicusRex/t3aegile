@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export default function Page() {
   const { setTheme } = useTheme();
   return (
-    <div>
+    <div className="border border-red-500 p-4 sm:px-6">
       <h1 className="text-2xl font-semibold">Settings</h1>
       <div className="my-4 space-y-4">
         <div>

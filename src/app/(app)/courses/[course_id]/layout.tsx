@@ -30,7 +30,7 @@ export default async function CourseLayout({
         isMember={isCourseMember}
       >
         <div className="navbar-container">{navbar}</div>
-        <main className="flex flex-1 flex-col border border-red-500 p-4">
+        <main className="flex flex-1 flex-col border border-red-500 px-4 py-6 md:px-10">
           {children}
         </main>
       </Protect>
