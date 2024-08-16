@@ -81,7 +81,7 @@ export default async function AppLayout({
           </div>
         </div>
 
-        <Toaster richColors />
+        <Toaster richColors closeButton />
       </main>
     );
   }
