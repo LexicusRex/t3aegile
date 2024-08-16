@@ -10,8 +10,8 @@ interface CoursePageProps {
 export default async function CourseSettingsPage({ params }: CoursePageProps) {
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">General</h3>
+      <div className="space-y-2">
+        <h3 className="font-semibold leading-none tracking-tight">General</h3>
         <p className="text-sm text-muted-foreground">
           Edit general information about your course.
         </p>

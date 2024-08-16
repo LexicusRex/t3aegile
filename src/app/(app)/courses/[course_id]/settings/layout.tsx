@@ -19,7 +19,7 @@ export default function CourseSettingsLayout({
 }: CourseSettingsLayoutProps) {
   const settingsNavItems = [
     {
-      title: "Overview",
+      title: "General",
       href: `/courses/${params.course_id}/settings`,
     },
     {
@@ -37,8 +37,10 @@ export default function CourseSettingsLayout({
   ];
   return (
     <Protect courseId={params.course_id} permissionSlug="course:edit">
-      <div className="space-y-0.5">
-        <h2 className="text-xl font-medium tracking-tight">Course Settings</h2>
+      <div className="space-y-2">
+        <h2 className="font-semibold leading-none tracking-tight">
+          Course Settings
+        </h2>
         <p className="text-sm text-muted-foreground">
           Manage settings and preferences related to this course.
         </p>
