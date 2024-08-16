@@ -31,6 +31,7 @@ const revalidateCourses = () => revalidatePath("/courses");
 export const createCourseAction = async (input: NewCourseParams) => {
   try {
     const payload = insertCourseParams.parse(input);
+    console.log("🚀 ~ createCourseAction ~ payload:", payload);
     await createCourse(payload);
     revalidateCourses();
   } catch (e) {

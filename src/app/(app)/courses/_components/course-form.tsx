@@ -9,32 +9,45 @@ import {
   updateCourseAction,
 } from "@/server/actions/courses";
 import { insertCourseParams, type Course } from "@/server/db/schema/course";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormStatus } from "react-dom";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { cn, type Action } from "@/lib/utils";
 import { useValidatedForm } from "@/hooks/useValidatedForm";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { DialogClose, DialogFooter } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useBackPath } from "@/components/shared/back-button";
-
-// import { type TAddOptimistic } from "@/app/(app)/courses/useOptimisticCourses";
 
 const CourseForm = ({
   course,
   openModal,
   closeModal,
-  // addOptimistic,
-  postSuccess,
+  closeDialog,
 }: {
   course?: Course | null;
   openModal?: (course?: Course) => void;
   closeModal?: () => void;
-  // addOptimistic?: TAddOptimistic;
-  postSuccess?: () => void;
+  closeDialog?: () => void;
 }) => {
   const { errors, hasErrors, setErrors, handleChange } =
     useValidatedForm<Course>(insertCourseParams);
@@ -58,19 +71,29 @@ const CourseForm = ({
       });
     } else {
       router.refresh();
-      postSuccess && postSuccess();
+      closeDialog && closeDialog();
       toast.success(`Course ${action}d!`);
       if (action === "delete") router.push(backpath);
     }
   };
 
-  const handleSubmit = async (data: FormData) => {
+  const handleSubmit = async (data: Course) => {
     setErrors(null);
 
-    const payload = Object.fromEntries(data.entries());
+    const payload = data;
+    toast(
+      <div className="w-full">
+        <p>You are attempting to submit the following values:</p>
+        <pre className="mt-2 w-full rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(payload, null, 2)}</code>
+        </pre>
+      </div>,
+    );
     const courseParsed = await insertCourseParams.safeParseAsync({
       ...payload,
     });
+    console.log("🚀 ~ handleSubmit ~ courseParsed:", courseParsed);
+
     if (!courseParsed.success) {
       setErrors(courseParsed?.error.flatten().fieldErrors);
       return;
@@ -82,16 +105,12 @@ const CourseForm = ({
       updatedAt: course?.updatedAt ?? new Date(),
       createdAt: course?.createdAt ?? new Date(),
       id: course?.id ?? "",
+      memberCount: Number(course?.memberCount) ?? null,
+      defaultRoleId: course?.defaultRoleId ?? null,
       ...values,
     };
     try {
       startMutation(async () => {
-        // addOptimistic &&
-        //   addOptimistic({
-        //     data: pendingCourse,
-        //     action: editing ? "update" : "create",
-        //   });
-
         const error = editing
           ? await updateCourseAction({ ...values, id: course.id })
           : await createCourseAction(values);
@@ -112,148 +131,139 @@ const CourseForm = ({
     }
   };
 
+  const form = useForm<Course>({
+    resolver: zodResolver(insertCourseParams),
+    // defaultValues: {
+    //   term: "24T0",
+    //   code: "COMP1511",
+    //   name: "Programming Fundamentals",
+    //   isActive: true,
+    //   description: "An introduction to programming in C.",
+    // },
+    mode: "onChange",
+  });
+  const year = new Date().getFullYear().toString().slice(-2);
   return (
-    <form action={handleSubmit} onChange={handleChange} className={"space-y-8"}>
-      {/* Schema fields start */}
-      <div>
-        <Label
-          className={cn(
-            "mb-2 inline-block",
-            errors?.name ? "text-destructive" : "",
-          )}
-        >
-          Name
-        </Label>
-        <Input
-          type="text"
+    <Form {...form}>
+      <form
+        // action={handleSubmit}
+        onSubmit={form.handleSubmit(handleSubmit)}
+        onChange={handleChange}
+        className={"space-y-6"}
+      >
+        {/* Schema fields start */}
+        <div className="flex items-start justify-between gap-x-4">
+          <FormField
+            control={form.control}
+            name="term"
+            render={({ field }) => (
+              <FormItem className="w-1/2">
+                <FormLabel>Term Offering</FormLabel>
+                <Select
+                  // defaultValue={field.value}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a term" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={`${year}T0`}>{`${year}T0`}</SelectItem>
+                    <SelectItem value={`${year}T1`}>{`${year}T1`}</SelectItem>
+                    <SelectItem value={`${year}T2`}>{`${year}T2`}</SelectItem>
+                    <SelectItem value={`${year}T3`}>{`${year}T3`}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage className="h-5" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Course Code</FormLabel>
+                <FormControl>
+                  <Input placeholder="COMP1511" {...field} />
+                </FormControl>
+                <FormMessage className="h-5" />
+              </FormItem>
+            )}
+          />
+        </div>
+        <FormField
+          control={form.control}
           name="name"
-          className={cn(errors?.name ? "ring ring-destructive" : "")}
-          defaultValue={course?.name ?? ""}
-        />
-        {errors?.name ? (
-          <p className="mt-2 text-xs text-destructive">{errors.name[0]}</p>
-        ) : (
-          <div className="h-6" />
-        )}
-      </div>
-      <div>
-        <Label
-          className={cn(
-            "mb-2 inline-block",
-            errors?.code ? "text-destructive" : "",
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Course Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Programming Fundamentals" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        >
-          Code
-        </Label>
-        <Input
-          type="text"
-          name="code"
-          className={cn(errors?.code ? "ring ring-destructive" : "")}
-          defaultValue={course?.code ?? ""}
         />
-        {errors?.code ? (
-          <p className="mt-2 text-xs text-destructive">{errors.code[0]}</p>
-        ) : (
-          <div className="h-6" />
-        )}
-      </div>
-      <div>
-        <Label
-          className={cn(
-            "mb-2 inline-block",
-            errors?.term ? "text-destructive" : "",
-          )}
-        >
-          Term Offering
-        </Label>
-        <Input
-          type="text"
-          name="term"
-          className={cn(errors?.term ? "ring ring-destructive" : "")}
-          defaultValue={course?.term ?? ""}
-        />
-        {errors?.term ? (
-          <p className="mt-2 text-xs text-destructive">{errors.term[0]}</p>
-        ) : (
-          <div className="h-6" />
-        )}
-      </div>
-      <div>
-        <Label
-          className={cn(
-            "mb-2 inline-block",
-            errors?.description ? "text-destructive" : "",
-          )}
-        >
-          Description
-        </Label>
-        <Input
-          type="text"
+        <FormField
+          control={form.control}
           name="description"
-          className={cn(errors?.description ? "ring ring-destructive" : "")}
-          defaultValue={course?.description ?? ""}
-        />
-        {errors?.description ? (
-          <p className="mt-2 text-xs text-destructive">
-            {errors.description[0]}
-          </p>
-        ) : (
-          <div className="h-6" />
-        )}
-      </div>
-      <div>
-        <Label
-          className={cn(
-            "mb-2 inline-block",
-            errors?.isActive ? "text-destructive" : "",
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Tell us about the course"
+                  className="resize-none"
+                  {...field}
+                  value={field.value ?? ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        >
-          Is Active
-        </Label>
-        <br />
-        <Checkbox
-          defaultChecked={course?.isActive ?? false}
-          name={"isActive"}
-          className={cn(errors?.isActive ? "ring ring-destructive" : "")}
         />
-        {errors?.isActive ? (
-          <p className="mt-2 text-xs text-destructive">{errors.isActive[0]}</p>
-        ) : (
-          <div className="h-6" />
-        )}
-      </div>
-      {/* Schema fields end */}
+        {/* Schema fields end */}
 
-      {/* Save Button */}
-      <SaveButton errors={hasErrors} editing={editing} />
+        <DialogFooter className="sm:justify-start">
+          <DialogClose asChild>
+            {/* Save Button */}
+            <>
+              <SaveButton errors={hasErrors} editing={editing} />
 
-      {/* Delete Button */}
-      {editing ? (
-        <Button
-          type="button"
-          disabled={isDeleting || pending || hasErrors}
-          variant={"destructive"}
-          onClick={() => {
-            setIsDeleting(true);
-            closeModal && closeModal();
-            startMutation(async () => {
-              // addOptimistic &&
-              //   addOptimistic({ action: "delete", data: course });
-              const error = await deleteCourseAction(course.id);
-              setIsDeleting(false);
-              const errorFormatted = {
-                error: error ?? "Error",
-                values: course,
-              };
+              {/* Delete Button */}
+              {editing ? (
+                <Button
+                  type="button"
+                  disabled={isDeleting || pending || hasErrors}
+                  variant={"destructive"}
+                  onClick={() => {
+                    setIsDeleting(true);
+                    closeModal && closeModal();
+                    startMutation(async () => {
+                      // addOptimistic &&
+                      //   addOptimistic({ action: "delete", data: course });
+                      const error = await deleteCourseAction(course.id);
+                      setIsDeleting(false);
+                      const errorFormatted = {
+                        error: error ?? "Error",
+                        values: course,
+                      };
 
-              onSuccess("delete", error ? errorFormatted : undefined);
-            });
-          }}
-        >
-          Delet{isDeleting ? "ing..." : "e"}
-        </Button>
-      ) : null}
-    </form>
+                      onSuccess("delete", error ? errorFormatted : undefined);
+                    });
+                  }}
+                >
+                  Delet{isDeleting ? "ing..." : "e"}
+                </Button>
+              ) : null}
+            </>
+          </DialogClose>
+        </DialogFooter>
+      </form>
+    </Form>
   );
 };
 
