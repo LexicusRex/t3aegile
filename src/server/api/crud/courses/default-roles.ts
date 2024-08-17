@@ -1,10 +1,11 @@
 export const defaultRoles = [
   {
-    displayName: "Instructor",
+    name: "Instructor",
+    isDefault: false,
     permissions: ["course:view", "course:edit", "tutorial:view"],
   },
-  { displayName: "Assistant", permissions: ["course:view"] },
-  { displayName: "Grading_Tutor", permissions: ["course:view"] },
-  { displayName: "Non_Grading_Tutor", permissions: ["course:view"] },
-  { displayName: "Student", permissions: ["course:view"] },
+  { name: "Assistant", isDefault: false, permissions: ["course:view"] },
+  { name: "Grading_Tutor", isDefault: false, permissions: ["course:view"] },
+  { name: "Non_Grading_Tutor", isDefault: false, permissions: ["course:view"] },
+  { name: "Student", isDefault: true, permissions: ["course:view"] },
 ];

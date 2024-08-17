@@ -9,6 +9,7 @@ import {
   rolePermissions,
   type NewRolePermission,
 } from "@/server/db/schema/rolePermissions";
+import type { DrizzleTransaction } from "@/server/db/types";
 import { and, eq } from "drizzle-orm";
 
 export const createRole = async (role: NewRoleParams) => {
@@ -19,7 +20,7 @@ export const createRole = async (role: NewRoleParams) => {
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);
-    throw { error: message };
+    throw { error: message, message };
   }
 };
 
@@ -36,7 +37,7 @@ export const enableRolePermission = async (
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);
-    throw { error: message };
+    throw { error: message, message };
   }
 };
 
@@ -57,6 +58,6 @@ export const disableRolePermission = async (
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);
-    throw { error: message };
+    throw { error: message, message };
   }
 };

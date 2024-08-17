@@ -1,5 +1,5 @@
 import { db } from "@/server/db/index";
-import { courseEnrolments } from "@/server/db/schema";
+import { courseEnrolments, roles } from "@/server/db/schema";
 import {
   courseIdSchema,
   courses,
@@ -14,21 +14,57 @@ import {
   insertCourseEnrolmentSchema,
   type CourseEnrolment,
 } from "@/server/db/schema/courseEnrolment";
+import type { DrizzleTransaction } from "@/server/db/types";
 import { and, eq, sql } from "drizzle-orm";
 
 import { createRole, enableRolePermission } from "../roles/mutations";
 import { defaultRoles } from "./default-roles";
+
+// export const createCourse = async (course: NewCourseParams) => {
+//   const newCourse = insertCourseSchema.parse(course);
+//   try {
+//     return await db.transaction(async (tx) => {
+//       // Insert the course
+//       const [crs] = await tx.insert(courses).values(newCourse).returning();
+
+//       // Attempt to initialize default roles
+//       try {
+//         await initDefaultRoles(crs!, tx);
+//       } catch (err) {
+//         console.error(
+//           "Failed to initialize roles, rolling back course creation.",
+//         );
+//         throw err; // Escalate the error to trigger a rollback of the course
+//       }
+
+//       return { course: crs };
+//     });
+//   } catch (err) {
+//     const message = (err as Error).message ?? "Error, please try again";
+//     console.error(message);
+//     throw { error: message };
+//   }
+//   // try {
+//   //   const [crs] = await db.insert(courses).values(newCourse).returning();
+//   //   await initDefaultRoles(crs!);
+//   //   return { course: crs };
+//   // } catch (err) {
+//   //   const message = (err as Error).message ?? "Error, please try again";
+//   //   console.error(message);
+//   //   throw { error: message };
+//   // }
+// };
 
 export const createCourse = async (course: NewCourseParams) => {
   const newCourse = insertCourseSchema.parse(course);
   try {
     const [crs] = await db.insert(courses).values(newCourse).returning();
     await initDefaultRoles(crs!);
-    return { course: crs };
+    // return { course: crs };
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);
-    throw { error: message };
+    throw { error: message, message };
   }
 };
 
@@ -48,7 +84,7 @@ export const updateCourse = async (
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);
-    throw { error: message };
+    throw { error: message, message };
   }
 };
 
@@ -63,35 +99,30 @@ export const deleteCourse = async (id: CourseId) => {
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);
-    throw { error: message };
+    throw { error: message, message };
   }
 };
 
 const initDefaultRoles = async (course: Course) => {
-  let lastRoleId: string | undefined;
-  for (const role of defaultRoles) {
-    const newRole = await createRole({
-      name: `${course.term}_${course.code}_${role.displayName}`,
-      displayName: role.displayName,
-    });
-
-    lastRoleId = newRole.id;
-
-    for (const permission of role.permissions) {
-      await enableRolePermission({
-        roleId: newRole.id ?? "",
-        permission: permission,
+  try {
+    for (const role of defaultRoles) {
+      const newRole = await createRole({
+        name: role.name,
+        courseId: course.id,
+        isCourseDefault: role.isDefault,
       });
+
+      for (const permission of role.permissions) {
+        await enableRolePermission({
+          roleId: newRole.id ?? "",
+          permission: permission,
+        });
+      }
     }
-  }
-  // TODO - set the final role as the default role for the course
-  if (course.id && lastRoleId) {
-    await db
-      .update(courses)
-      .set({ defaultRoleId: lastRoleId })
-      .where(eq(courses.id, course.id));
-  } else {
-    throw new Error("Course ID is undefined. Cannot set the default role.");
+  } catch (err) {
+    const message = (err as Error).message ?? "Error, please try again";
+    console.error(message);
+    throw { error: message, message };
   }
 };
 
@@ -100,9 +131,9 @@ export const enrolUser = async (courseEnrolment: CourseEnrolment) => {
     insertCourseEnrolmentSchema.parse(courseEnrolment);
 
   const res = await db
-    .select({ defaultRoleId: courses.defaultRoleId })
-    .from(courses)
-    .where(eq(courses.id, courseId));
+    .select({ defaultRoleId: roles.id })
+    .from(roles)
+    .where(and(eq(roles.courseId, courseId), eq(roles.isCourseDefault, true)));
 
   if (!res[0]?.defaultRoleId) {
     throw new Error("Course has no default role");
