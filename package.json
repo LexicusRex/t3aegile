@@ -46,6 +46,7 @@
     "@trpc/client": "^11.0.0-rc.446",
     "@trpc/react-query": "^11.0.0-rc.446",
     "@trpc/server": "^11.0.0-rc.446",
+    "@vercel/postgres": "^0.9.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
@@ -92,7 +93,8 @@
     "prettier-plugin-tailwindcss": "^0.6.5",
     "tailwindcss": "^3.4.3",
     "tsx": "^4.17.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vercel": "^36.0.0"
   },
   "ct3aMetadata": {
     "initVersion": "7.36.2"
