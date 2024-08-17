@@ -47,9 +47,15 @@ export const coursesRelations = relations(courses, ({ many }) => ({
 }));
 
 // Schema for courses - used to validate API requests
-const baseSchema = createSelectSchema(courses).omit(timestamps);
+const baseSchema = createSelectSchema(courses).omit({
+  ...timestamps,
+  memberCount: true,
+});
 
-export const insertCourseSchema = createInsertSchema(courses).omit(timestamps);
+export const insertCourseSchema = createInsertSchema(courses).omit({
+  ...timestamps,
+  memberCount: true,
+});
 export const insertCourseParams = baseSchema
   .extend({
     term: z.string({
@@ -70,31 +76,25 @@ export const insertCourseParams = baseSchema
   })
   .omit({
     id: true,
-    memberCount: true,
   });
 
 export const updateCourseSchema = baseSchema;
-export const updateCourseParams = baseSchema
-  .extend({
-    term: z.string({
-      required_error: "Please select a term offering.",
+export const updateCourseParams = baseSchema.extend({
+  term: z.string({
+    required_error: "Please select a term offering.",
+  }),
+  code: z
+    .string()
+    .length(8, { message: "Course code must be exactly 8 characters." })
+    .refine((code) => /^[A-Za-z]{4}\d{4}$/.test(code), {
+      message: "Course code must begin with 4 letters and end with 4 numbers.",
     }),
-    code: z
-      .string()
-      .length(8, { message: "Course code must be exactly 8 characters." })
-      .refine((code) => /^[A-Za-z]{4}\d{4}$/.test(code), {
-        message:
-          "Course code must begin with 4 letters and end with 4 numbers.",
-      }),
-    name: z.string().min(1, { message: "Course name is required." }).max(120, {
-      message: "Course name must not exceed 120 characters.",
-    }),
-    isActive: z.coerce.boolean().default(true),
-    description: z.string().optional(),
-  })
-  .omit({
-    memberCount: true,
-  });
+  name: z.string().min(1, { message: "Course name is required." }).max(120, {
+    message: "Course name must not exceed 120 characters.",
+  }),
+  isActive: z.coerce.boolean().default(true),
+  description: z.string().optional(),
+});
 export const courseIdSchema = baseSchema.pick({ id: true });
 
 // Types for courses - used to type API request params and within Components
