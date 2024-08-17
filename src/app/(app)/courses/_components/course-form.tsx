@@ -10,15 +10,24 @@ import {
 } from "@/server/actions/courses";
 import { insertCourseParams, type Course } from "@/server/db/schema/course";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFormStatus } from "react-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { cn, type Action } from "@/lib/utils";
+import { type Action } from "@/lib/utils";
 import { useValidatedForm } from "@/hooks/useValidatedForm";
-import { Button } from "@/components/ui/button";
-import { DialogClose, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -35,18 +44,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { useBackPath } from "@/components/shared/back-button";
 
 const CourseForm = ({
   course,
-  openModal,
-  closeModal,
   closeDialog,
 }: {
   course?: Course | null;
-  openModal?: (course?: Course) => void;
-  closeModal?: () => void;
   closeDialog?: () => void;
 }) => {
   const { errors, hasErrors, setErrors, handleChange } =
@@ -57,27 +62,30 @@ const CourseForm = ({
   const [pending, startMutation] = useTransition();
 
   const router = useRouter();
-  const backpath = useBackPath("courses");
+  const backpath = "/courses";
 
   const onSuccess = (
     action: Action,
     data?: { error: string; values: Course },
+    payload?: Course,
   ) => {
     const failed = Boolean(data?.error);
     if (failed) {
-      openModal && openModal(data?.values);
       toast.error(`Failed to ${action}`, {
         description: data?.error ?? "Error",
       });
     } else {
-      router.refresh();
-      closeDialog && closeDialog();
+      form.reset(payload);
       toast.success(`Course ${action}d!`);
+      closeDialog && closeDialog();
+      router.refresh();
       if (action === "delete") router.push(backpath);
     }
   };
 
   const handleSubmit = async (data: Course) => {
+    // timeout 5 seconds here
+    await new Promise((resolve) => setTimeout(resolve, 250));
     setErrors(null);
 
     const payload = data;
@@ -92,21 +100,18 @@ const CourseForm = ({
     const courseParsed = await insertCourseParams.safeParseAsync({
       ...payload,
     });
-    console.log("🚀 ~ handleSubmit ~ courseParsed:", courseParsed);
 
     if (!courseParsed.success) {
       setErrors(courseParsed?.error.flatten().fieldErrors);
       return;
     }
 
-    closeModal && closeModal();
     const values = courseParsed.data;
     const pendingCourse: Course = {
       updatedAt: course?.updatedAt ?? new Date(),
       createdAt: course?.createdAt ?? new Date(),
       id: course?.id ?? "",
       memberCount: Number(course?.memberCount) ?? null,
-      defaultRoleId: course?.defaultRoleId ?? null,
       ...values,
     };
     try {
@@ -122,6 +127,7 @@ const CourseForm = ({
         onSuccess(
           editing ? "update" : "create",
           error ? errorFormatted : undefined,
+          payload,
         );
       });
     } catch (e) {
@@ -133,137 +139,148 @@ const CourseForm = ({
 
   const form = useForm<Course>({
     resolver: zodResolver(insertCourseParams),
-    // defaultValues: {
-    //   term: "24T0",
-    //   code: "COMP1511",
-    //   name: "Programming Fundamentals",
-    //   isActive: true,
-    //   description: "An introduction to programming in C.",
-    // },
+    defaultValues: {
+      term: course?.term ?? "",
+      code: course?.code ?? "",
+      name: course?.name ?? "",
+      isActive: course?.isActive ?? true,
+      description: course?.description ?? "",
+    },
     mode: "onChange",
   });
   const year = new Date().getFullYear().toString().slice(-2);
+
   return (
-    <Form {...form}>
-      <form
-        // action={handleSubmit}
-        onSubmit={form.handleSubmit(handleSubmit)}
-        onChange={handleChange}
-        className={"space-y-6"}
-      >
-        {/* Schema fields start */}
-        <div className="flex items-start justify-between gap-x-4">
-          <FormField
-            control={form.control}
-            name="term"
-            render={({ field }) => (
-              <FormItem className="w-1/2">
-                <FormLabel>Term Offering</FormLabel>
-                <Select
-                  // defaultValue={field.value}
-                  value={field.value}
-                  onValueChange={field.onChange}
-                >
+    <div className="space-y-12">
+      <Form {...form}>
+        <form
+          // action={handleSubmit}
+          onSubmit={form.handleSubmit(handleSubmit)}
+          onChange={handleChange}
+          className={"space-y-6"}
+        >
+          {/* Schema fields start */}
+          <div className="flex items-start justify-between gap-x-4">
+            <FormField
+              control={form.control}
+              name="term"
+              render={({ field }) => (
+                <FormItem className="w-1/2">
+                  <FormLabel>Term Offering</FormLabel>
+                  <Select
+                    // defaultValue={field.value}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a term" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={`${year}T0`}>{`${year}T0`}</SelectItem>
+                      <SelectItem value={`${year}T1`}>{`${year}T1`}</SelectItem>
+                      <SelectItem value={`${year}T2`}>{`${year}T2`}</SelectItem>
+                      <SelectItem value={`${year}T3`}>{`${year}T3`}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage className="h-5" />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Course Code</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a term" />
-                    </SelectTrigger>
+                    <Input placeholder="COMP1511" {...field} />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value={`${year}T0`}>{`${year}T0`}</SelectItem>
-                    <SelectItem value={`${year}T1`}>{`${year}T1`}</SelectItem>
-                    <SelectItem value={`${year}T2`}>{`${year}T2`}</SelectItem>
-                    <SelectItem value={`${year}T3`}>{`${year}T3`}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage className="h-5" />
-              </FormItem>
-            )}
-          />
+                  <FormMessage className="h-5" />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
-            name="code"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Course Code</FormLabel>
+                <FormLabel>Course Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="COMP1511" {...field} />
+                  <Input placeholder="Programming Fundamentals" {...field} />
                 </FormControl>
-                <FormMessage className="h-5" />
+                <FormMessage />
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Tell us about the course"
+                    className="resize-none"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Schema fields end */}
+
+          {/* Save Button */}
+          <SaveButton
+            errors={hasErrors}
+            editing={editing}
+            pending={form.formState.isSubmitting}
+            isDirty={form.formState.isDirty}
+          />
+        </form>
+      </Form>
+      {editing ? (
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h3 className="font-semibold leading-none tracking-tight text-destructive">
+              Danger Zone
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Permanently delete this course and all associated data.
+            </p>
+          </div>
+          <Separator />
+          {/* Delete Button */}
+          <AlertDeleteDialog>
+            <Button
+              type="button"
+              disabled={isDeleting || pending || hasErrors}
+              variant="destructive"
+              onClick={() => {
+                setIsDeleting(true);
+                startMutation(async () => {
+                  const error = await deleteCourseAction(course.id);
+                  setIsDeleting(false);
+                  const errorFormatted = {
+                    error: error ?? "Error",
+                    values: course,
+                  };
+
+                  onSuccess("delete", error ? errorFormatted : undefined);
+                });
+              }}
+            >
+              Delet{isDeleting ? "ing..." : "e"}
+            </Button>
+          </AlertDeleteDialog>
         </div>
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Course Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Programming Fundamentals" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Tell us about the course"
-                  className="resize-none"
-                  {...field}
-                  value={field.value ?? ""}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* Schema fields end */}
-
-        <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            {/* Save Button */}
-            <>
-              <SaveButton errors={hasErrors} editing={editing} />
-
-              {/* Delete Button */}
-              {editing ? (
-                <Button
-                  type="button"
-                  disabled={isDeleting || pending || hasErrors}
-                  variant={"destructive"}
-                  onClick={() => {
-                    setIsDeleting(true);
-                    closeModal && closeModal();
-                    startMutation(async () => {
-                      // addOptimistic &&
-                      //   addOptimistic({ action: "delete", data: course });
-                      const error = await deleteCourseAction(course.id);
-                      setIsDeleting(false);
-                      const errorFormatted = {
-                        error: error ?? "Error",
-                        values: course,
-                      };
-
-                      onSuccess("delete", error ? errorFormatted : undefined);
-                    });
-                  }}
-                >
-                  Delet{isDeleting ? "ing..." : "e"}
-                </Button>
-              ) : null}
-            </>
-          </DialogClose>
-        </DialogFooter>
-      </form>
-    </Form>
+      ) : null}
+    </div>
   );
 };
 
@@ -272,23 +289,56 @@ export default CourseForm;
 const SaveButton = ({
   editing,
   errors,
+  pending,
+  isDirty,
 }: {
   editing: boolean;
   errors: boolean;
+  pending: boolean;
+  isDirty?: boolean;
 }) => {
-  const { pending } = useFormStatus();
   const isCreating = pending && editing === false;
   const isUpdating = pending && editing === true;
   return (
     <Button
       type="submit"
       className="mr-2"
-      disabled={isCreating || isUpdating || errors}
+      disabled={isCreating || isUpdating || errors || !isDirty}
       aria-disabled={isCreating || isUpdating || errors}
     >
       {editing
         ? `Sav${isUpdating ? "ing..." : "e"}`
         : `Creat${isCreating ? "ing..." : "e"}`}
     </Button>
+  );
+};
+
+const AlertDeleteDialog = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive">Delete Course</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-destructive">
+            Are you absolutely sure?
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete this
+            course and remove all course associated data from our servers.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            asChild
+            className={buttonVariants({ variant: "destructive" })}
+          >
+            {children}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
