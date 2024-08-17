@@ -1,11 +1,18 @@
 import { relations, sql } from "drizzle-orm";
-import { index, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  timestamp,
+  unique,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 import { timestamps } from "@/lib/utils";
 
 import { ID_LENGTH } from "./config";
+import { courses } from "./course";
 import { rolePermissions } from "./rolePermissions";
 import { createTable, generateId } from "./util";
 
@@ -16,8 +23,14 @@ export const roles = createTable(
       .notNull()
       .primaryKey()
       .$defaultFn(() => generateId("rol")),
-    name: varchar("name", { length: 255 }).notNull().unique(),
-    displayName: varchar("display_name", { length: 255 }).notNull(),
+    courseId: varchar("course_id", { length: ID_LENGTH })
+      .notNull()
+      .references(() => courses.id, {
+        onUpdate: "no action",
+        onDelete: "cascade",
+      }),
+    isCourseDefault: boolean("is_course_default").default(false),
+    name: varchar("name", { length: 255 }).notNull(),
     createdAt: timestamp("created_at", {
       mode: "date",
       withTimezone: true,
@@ -28,7 +41,7 @@ export const roles = createTable(
     }).default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => ({
-    roleNameIdx: index("role_name_idx").on(t.name),
+    uniqueCourseRole: unique("unq_course_role").on(t.courseId, t.name),
   }),
 );
 
@@ -46,12 +59,6 @@ export const insertRoleParams = baseRoleSchema
     name: z.string().min(1, { message: "Role name is required." }).max(255, {
       message: "Role name must not exceed 255 characters.",
     }),
-    displayName: z
-      .string()
-      .min(1, { message: "Display name is required." })
-      .max(255, {
-        message: "Display name must not exceed 255 characters.",
-      }),
   })
   .omit({
     id: true,
@@ -63,12 +70,6 @@ export const updateRoleParams = baseRoleSchema.extend({
   name: z.string().min(1, { message: "Role name is required." }).max(255, {
     message: "Role name must not exceed 255 characters.",
   }),
-  displayName: z
-    .string()
-    .min(1, { message: "Display name is required." })
-    .max(255, {
-      message: "Display name must not exceed 255 characters.",
-    }),
 });
 export const roleIdSchema = baseRoleSchema.pick({ id: true });
 

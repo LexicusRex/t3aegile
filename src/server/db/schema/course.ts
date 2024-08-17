@@ -15,7 +15,6 @@ import { timestamps } from "@/lib/utils";
 
 import { ID_LENGTH } from "./config";
 import { courseEnrolments } from "./courseEnrolment";
-import { roles } from "./role";
 import { createTable, generateId } from "./util";
 
 export const courses = createTable(
@@ -31,9 +30,6 @@ export const courses = createTable(
     description: text("description"),
     isActive: boolean("is_active").default(true),
     memberCount: integer("member_count").default(0),
-    defaultRoleId: varchar("default_role", { length: ID_LENGTH }).references(
-      () => roles.id,
-    ),
     createdAt: timestamp("created_at", {
       mode: "date",
       withTimezone: true,
@@ -75,7 +71,6 @@ export const insertCourseParams = baseSchema
   .omit({
     id: true,
     memberCount: true,
-    defaultRoleId: true,
   });
 
 export const updateCourseSchema = baseSchema;
@@ -99,7 +94,6 @@ export const updateCourseParams = baseSchema
   })
   .omit({
     memberCount: true,
-    defaultRoleId: true,
   });
 export const courseIdSchema = baseSchema.pick({ id: true });
 
