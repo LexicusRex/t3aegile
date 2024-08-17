@@ -1,4 +1,5 @@
-import { conn, db } from "@/server/db";
+// import { conn, db } from "@/server/db";
+import { db } from "@/server/db";
 import * as schema from "@/server/db/schema";
 import { getTableName, sql, type Table } from "drizzle-orm";
 
@@ -45,4 +46,4 @@ await seeds.permission(db);
 // await seeds.user(db);
 // await seeds.order(db);
 
-await conn.end();
+// await conn.end();
