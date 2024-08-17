@@ -1,23 +1,29 @@
+import { cache } from "react";
+import { redirect } from "next/navigation";
+
+import { db } from "@/server/db";
+import {
+  accounts,
+  courseEnrolments,
+  permissions,
+  rolePermissions,
+  sessions,
+  users,
+  verificationTokens,
+} from "@/server/db/schema";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { and, eq } from "drizzle-orm";
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import { type Adapter } from "next-auth/adapters";
+import type { Adapter } from "next-auth/adapters";
 import DiscordProvider from "next-auth/providers/discord";
-import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 import { env } from "@/env";
-import { db } from "@/server/db";
-import {
-  accounts,
-  sessions,
-  users,
-  verificationTokens,
-} from "@/server/db/schema";
-import { redirect } from "next/navigation";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -31,13 +37,15 @@ declare module "next-auth" {
       id: string;
       // ...other properties
       // role: UserRole;
+      isSuperuser: boolean;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    // ...other properties
+    // role: UserRole;
+    isSuperuser: boolean;
+  }
 }
 
 /**
@@ -52,6 +60,7 @@ export const authOptions: NextAuthOptions = {
       user: {
         ...session.user,
         id: user.id,
+        isSuperuser: user.isSuperuser,
       },
     }),
   },
@@ -73,7 +82,7 @@ export const authOptions: NextAuthOptions = {
     GithubProvider({
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
-    })
+    }),
     /**
      * ...add more providers here.
      *
@@ -94,12 +103,65 @@ export const authOptions: NextAuthOptions = {
  *
  * @see https://next-auth.js.org/configuration/nextjs
  */
-export const getServerAuthSession = () => getServerSession(authOptions);
+export const getServerAuthSession = cache(
+  async () => await getServerSession(authOptions),
+);
 
+export const currentUser = async () => {
+  const session = await getServerAuthSession();
+  // if (!session) return null;
+  if (!session) throw new Error("Not authenticated");
+  return session.user;
+};
 
 export const checkAuth = async () => {
   const session = await getServerAuthSession();
+  // await promise that takes 1 second
   // if (!session) throw new Error("Not authenticated");
   if (!session) redirect("/api/auth/signin");
+};
 
-}
+export const testCall = async () => {
+  console.log("🚀 ~ testCall ~ FETCHING USER PERMISSIONS");
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return { "course:create": true };
+};
+
+export const hasCoursePermission = async (
+  userId: string,
+  courseId: string,
+  permissionSlug: string,
+) => {
+  const prepared = db
+    .select()
+    .from(courseEnrolments)
+    .where(
+      and(
+        eq(courseEnrolments.userId, userId),
+        eq(courseEnrolments.courseId, courseId),
+      ),
+    )
+    // .leftJoin(
+    .innerJoin(
+      rolePermissions,
+      and(
+        eq(courseEnrolments.roleId, rolePermissions.roleId),
+        eq(rolePermissions.permission, permissionSlug),
+      ),
+    );
+  // .innerJoin(
+  //   permissions,
+  //   and(
+  //     eq(rolePermissions.permissionId, permissions.id),
+  //     eq(permissions.slug, permissionSlug),
+  //   ),
+  // );
+
+  const result = await prepared.execute();
+  return result.length > 0;
+};
+
+export const checkCoursePermission = cache(
+  async (userId: string, courseId: string, permissionSlug: string) =>
+    await hasCoursePermission(userId, courseId, permissionSlug),
+);

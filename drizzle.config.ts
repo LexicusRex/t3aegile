@@ -4,9 +4,10 @@ import { env } from "@/env";
 
 export default {
   schema: "./src/server/db/schema/*",
+  out: "./src/server/db/migrations",
   dialect: "postgresql",
   dbCredentials: {
     url: env.DATABASE_URL,
   },
-  tablesFilter: ["t3aegile_*"],
+  // tablesFilter: ["t3aegile_*"],
 } satisfies Config;

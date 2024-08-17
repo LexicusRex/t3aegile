@@ -1,19 +1,20 @@
-import type { SidebarLink } from "@/components/sidebar-items";
 import {
-  Cog,
-  User,
-  HomeIcon,
   ArchiveIcon,
   BarChart3Icon,
   CalendarRangeIcon,
   FileBarChart2Icon,
   GraduationCapIcon,
+  HomeIcon,
   KanbanSquareIcon,
   ListTodoIcon,
   MessagesSquareIcon,
   Package2Icon,
   SettingsIcon,
+  UserIcon,
 } from "lucide-react";
+
+import type { SidebarLink } from "@/components/sidebar-items";
+
 type AdditionalLinks = {
   title: string;
   links: SidebarLink[];
@@ -26,7 +27,6 @@ export const defaultLinks: SidebarLink[] = [
   { href: "/tasks", title: "Tasks", icon: ListTodoIcon },
   { href: "/schedule", title: "Schedule", icon: CalendarRangeIcon },
   { href: "/archive", title: "Archive", icon: ArchiveIcon },
-
 ];
 
 export const additionalLinks: AdditionalLinks[] = [
@@ -48,14 +48,11 @@ export const additionalLinks: AdditionalLinks[] = [
         title: "Forums",
         icon: MessagesSquareIcon,
       },
+    ],
+  },
+];
 
-    ],
-  },
-  {
-    title: "Configuration",
-    links: [
-      { href: "/account", title: "Account", icon: User },
-      { href: "/settings", title: "Settings", icon: Cog },
-    ],
-  },
+export const footerLinks: SidebarLink[] = [
+  { href: "/account", title: "Account", icon: UserIcon },
+  { href: "/settings", title: "Settings", icon: SettingsIcon },
 ];

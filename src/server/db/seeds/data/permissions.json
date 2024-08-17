@@ -1,0 +1,10 @@
+[
+  { "slug": "course:create" },
+  { "slug": "course:edit" },
+  { "slug": "course:delete" },
+  { "slug": "course:view" },
+  { "slug": "course:fetch_all" },
+  { "slug": "course:manage_enrolments" },
+  { "slug": "tutorial:manage_enrolments" },
+  { "slug": "tutorial:view" }
+]
