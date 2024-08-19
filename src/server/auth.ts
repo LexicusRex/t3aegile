@@ -130,8 +130,9 @@ export const testCall = async () => {
 export const hasCoursePermission = async (
   userId: string,
   courseId: string,
-  permissionSlug: string,
+  permissionSlug?: string,
 ) => {
+  if (!permissionSlug) return false;
   const prepared = db
     .select()
     .from(courseEnrolments)
@@ -162,6 +163,6 @@ export const hasCoursePermission = async (
 };
 
 export const checkCoursePermission = cache(
-  async (userId: string, courseId: string, permissionSlug: string) =>
+  async (userId: string, courseId: string, permissionSlug?: string) =>
     await hasCoursePermission(userId, courseId, permissionSlug),
 );

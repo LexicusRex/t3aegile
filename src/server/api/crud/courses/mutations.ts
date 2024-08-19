@@ -1,3 +1,5 @@
+import "server-only";
+
 import { db } from "@/server/db/index";
 import { courseEnrolments, roles } from "@/server/db/schema";
 import {
@@ -55,11 +57,14 @@ import { defaultRoles } from "./default-roles";
 //   // }
 // };
 
-export const createCourse = async (course: NewCourseParams) => {
+export const createCourse = async (
+  course: NewCourseParams,
+  tx: DrizzleTransaction,
+) => {
   const newCourse = insertCourseSchema.parse(course);
   try {
-    const [crs] = await db.insert(courses).values(newCourse).returning();
-    await initDefaultRoles(crs!);
+    const [crs] = await tx.insert(courses).values(newCourse).returning();
+    await initDefaultRoles(crs!, tx);
     // return { course: crs };
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
@@ -71,11 +76,12 @@ export const createCourse = async (course: NewCourseParams) => {
 export const updateCourse = async (
   id: CourseId,
   course: UpdateCourseParams,
+  tx: DrizzleTransaction,
 ) => {
   const { id: courseId } = courseIdSchema.parse({ id });
   const newCourse = updateCourseSchema.parse(course);
   try {
-    const [c] = await db
+    const [c] = await tx
       .update(courses)
       .set({ ...newCourse, updatedAt: new Date() })
       .where(eq(courses.id, courseId))
@@ -88,10 +94,10 @@ export const updateCourse = async (
   }
 };
 
-export const deleteCourse = async (id: CourseId) => {
+export const deleteCourse = async (id: CourseId, tx: DrizzleTransaction) => {
   const { id: courseId } = courseIdSchema.parse({ id });
   try {
-    const [c] = await db
+    const [c] = await tx
       .delete(courses)
       .where(eq(courses.id, courseId))
       .returning();
@@ -103,20 +109,26 @@ export const deleteCourse = async (id: CourseId) => {
   }
 };
 
-const initDefaultRoles = async (course: Course) => {
+const initDefaultRoles = async (course: Course, tx: DrizzleTransaction) => {
   try {
     for (const role of defaultRoles) {
-      const newRole = await createRole({
-        name: role.name,
-        courseId: course.id,
-        isCourseDefault: role.isDefault,
-      });
+      const newRole = await createRole(
+        {
+          name: role.name,
+          courseId: course.id,
+          isCourseDefault: role.isDefault,
+        },
+        tx,
+      );
 
       for (const permission of role.permissions) {
-        await enableRolePermission({
-          roleId: newRole.id ?? "",
-          permission: permission,
-        });
+        await enableRolePermission(
+          {
+            roleId: newRole?.id ?? "",
+            permission: permission,
+          },
+          tx,
+        );
       }
     }
   } catch (err) {

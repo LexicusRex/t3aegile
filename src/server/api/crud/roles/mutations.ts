@@ -12,32 +12,34 @@ import {
 import type { DrizzleTransaction } from "@/server/db/types";
 import { and, eq } from "drizzle-orm";
 
-export const createRole = async (role: NewRoleParams) => {
+import { handleError } from "../utils";
+
+export const createRole = async (
+  role: NewRoleParams,
+  tx: DrizzleTransaction,
+) => {
   const newRole = insertRoleSchema.parse(role);
   try {
-    const [r] = await db.insert(roles).values(newRole).returning();
+    const [r] = await tx.insert(roles).values(newRole).returning();
     return { ...r };
   } catch (err) {
-    const message = (err as Error).message ?? "Error, please try again";
-    console.error(message);
-    throw { error: message, message };
+    handleError(err);
   }
 };
 
 export const enableRolePermission = async (
   rolePermission: NewRolePermission,
+  tx: DrizzleTransaction,
 ) => {
   const enabledPermission = insertRolePermissionSchema.parse(rolePermission);
   try {
-    const [rp] = await db
+    const [rp] = await tx
       .insert(rolePermissions)
       .values(enabledPermission)
       .returning();
     return { rolePermission: rp };
   } catch (err) {
-    const message = (err as Error).message ?? "Error, please try again";
-    console.error(message);
-    throw { error: message, message };
+    handleError(err);
   }
 };
 
@@ -56,8 +58,6 @@ export const disableRolePermission = async (
       )
       .returning();
   } catch (err) {
-    const message = (err as Error).message ?? "Error, please try again";
-    console.error(message);
-    throw { error: message, message };
+    handleError(err);
   }
 };
