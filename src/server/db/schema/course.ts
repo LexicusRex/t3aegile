@@ -58,9 +58,7 @@ export const insertCourseSchema = createInsertSchema(courses).omit({
 });
 export const insertCourseParams = baseSchema
   .extend({
-    term: z.string({
-      required_error: "Please select a term offering.",
-    }),
+    term: z.string().min(4, { message: "Please select a term offering." }),
     code: z
       .string()
       .length(8, { message: "Course code must be exactly 8 characters." })
@@ -80,9 +78,7 @@ export const insertCourseParams = baseSchema
 
 export const updateCourseSchema = baseSchema;
 export const updateCourseParams = baseSchema.extend({
-  term: z.string({
-    required_error: "Please select a term offering.",
-  }),
+  term: z.string().min(4, { message: "Please select a term offering." }),
   code: z
     .string()
     .length(8, { message: "Course code must be exactly 8 characters." })
