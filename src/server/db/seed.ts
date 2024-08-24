@@ -34,6 +34,7 @@ for (const table of [
   await resetTable(db, table as Table);
 }
 
+await seeds.user(db);
 await seeds.course(db);
 await seeds.permission(db);
 // await seeds.role(db);
