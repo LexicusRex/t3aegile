@@ -67,18 +67,28 @@ export const courseEnrolmentRelations = relations(
       fields: [courseEnrolments.courseId],
       references: [courses.id],
     }),
+    role: one(roles, {
+      fields: [courseEnrolments.roleId],
+      references: [roles.id],
+    }),
   }),
 );
 
 // Schema for courses - used to validate API requests
 const baseSchema = createSelectSchema(courseEnrolments).omit(timestamps);
 
-export const insertCourseEnrolmentSchema =
-  createInsertSchema(courseEnrolments).omit(timestamps);
-export const insertCourseEnrolmentParams = baseSchema;
+export const insertCourseEnrolmentSchema = createInsertSchema(
+  courseEnrolments,
+).omit({ ...timestamps, roleId: true });
+export const insertCourseEnrolmentParams = insertCourseEnrolmentSchema;
 
 export const updateCourseEnrolmentSchema = baseSchema;
 export const updateCourseEnrolmentParams = baseSchema;
+
+export const courseEnrolmentIdSchema = baseSchema.pick({
+  courseId: true,
+  userId: true,
+});
 
 // Types for courses - used to type API request params and within Components
 export type CourseEnrolment = typeof courseEnrolments.$inferSelect;
@@ -89,3 +99,4 @@ export type NewCourseEnrolmentParams = z.infer<
 export type UpdateCourseEnrolmentParams = z.infer<
   typeof updateCourseEnrolmentParams
 >;
+export type CourseEnrolmentId = z.infer<typeof courseEnrolmentIdSchema>;
