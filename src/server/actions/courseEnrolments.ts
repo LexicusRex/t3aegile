@@ -12,6 +12,7 @@ import {
 
 import { withTransaction } from "../api/crud/utils";
 import {
+  courseEnrolmentIdSchema,
   insertCourseEnrolmentParams,
   updateCourseEnrolmentParams,
   type CourseEnrolmentId,
@@ -42,11 +43,11 @@ export const updateCourseEnrolmentAction = permissionProtectedAction(
   "course:manage_enrolments",
 );
 
-export const deleteCourseAction = permissionProtectedAction(
+export const deleteCourseEnrolmentAction = permissionProtectedAction(
   async (input: CourseEnrolmentId) => {
-    // const payload = courseIdSchema.parse({ id: input });
+    const payload = courseEnrolmentIdSchema.parse(input);
     await withTransaction(async (tx) => {
-      await deleteCourseEnrolment(input, tx);
+      await deleteCourseEnrolment(payload, tx);
       // revalidateCourses();
     });
   },

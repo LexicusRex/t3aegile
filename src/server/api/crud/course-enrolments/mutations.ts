@@ -58,7 +58,7 @@ export const deleteCourseEnrolment = async (
   enrolmentIds: CourseEnrolmentId,
   tx: DrizzleTransaction,
 ) => {
-  const { courseId, userId } = courseEnrolmentIdSchema.parse({ enrolmentIds });
+  const { courseId, userId } = courseEnrolmentIdSchema.parse(enrolmentIds);
   try {
     await tx
       .delete(courseEnrolments)
