@@ -26,8 +26,8 @@ export const createCourseEnrolment = async (
 
     const [enr] = await tx
       .insert(courseEnrolments)
-      .values({ ...newEnrolment, roleId: defaultRoleId });
-    // .returning();
+      .values({ ...newEnrolment, roleId: defaultRoleId })
+      .returning();
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);
@@ -44,8 +44,8 @@ export const updateCourseEnrolment = async (
     const [enr] = await tx
       .update(courseEnrolments)
       .set({ ...updatedEnrolment, updatedAt: new Date() })
-      .where(eq(courseEnrolments.courseId, updatedEnrolment.courseId));
-    // .returning();
+      .where(eq(courseEnrolments.courseId, updatedEnrolment.courseId))
+      .returning();
     // return { course: c };
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
