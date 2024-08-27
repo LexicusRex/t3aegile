@@ -19,6 +19,8 @@ import { MembersTableToolbarActions } from "./participants-table-toolbar-actions
 interface MembersTableProps {
   members: CourseParticipant[];
   candidates: CourseEnrollable[];
+  hasRowActionPermission: boolean;
+  hasToolbarActionPermission: boolean;
 }
 
 const roles = [
@@ -42,8 +44,13 @@ const roles = [
 export default function CourseParticipantsTable({
   members,
   candidates,
+  hasRowActionPermission,
+  hasToolbarActionPermission,
 }: MembersTableProps) {
-  const columns = React.useMemo(() => getColumns(), []);
+  const columns = React.useMemo(
+    () => getColumns(hasRowActionPermission),
+    [hasRowActionPermission],
+  );
   const filterFields: DataTableFilterField<CourseParticipant>[] = [
     {
       label: "Email",
@@ -64,10 +71,12 @@ export default function CourseParticipantsTable({
   return (
     <DataTable table={table}>
       <DataTableToolbar table={table} filterFields={filterFields}>
-        <MembersTableToolbarActions
-          table={table}
-          enrollableUsers={candidates}
-        />
+        {hasToolbarActionPermission && (
+          <MembersTableToolbarActions
+            table={table}
+            enrollableUsers={candidates}
+          />
+        )}
       </DataTableToolbar>
     </DataTable>
   );

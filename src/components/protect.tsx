@@ -1,7 +1,8 @@
 import React, { type ReactNode } from "react";
 
-import { checkCoursePermission, getServerAuthSession } from "@/server/auth";
+import { verifyProtectedPermission } from "@/server/auth";
 
+import ErrorUnauthorizedGraphic from "@/components/common/error-401";
 import ErrorForbiddenGraphic from "@/components/common/error-403";
 
 interface ProtectProps {
@@ -19,34 +20,18 @@ export default async function Protect({
   hidden = false,
   children,
 }: ProtectProps) {
-  const session = await getServerAuthSession();
-
-  if (!session || !session.user || !session.user.id) {
-    return hidden ? null : <ErrorForbiddenGraphic />; // or return a fallback component like <Unauthorized />
-  }
-
-  const userId = session.user.id;
-
-  const hasPermission = await checkCoursePermission(
-    userId,
+  const { access, status } = await verifyProtectedPermission(
     courseId,
     permissionSlug,
+    isMember,
   );
 
-  // !session.user.isSuperuser && !hasPermission && isMember -> pass
-  // !session.user.isSuperuser && !hasPermission && !isMember -> fail
-  // !session.user.isSuperuser && hasPermission && !isMember -> pass
-  // session.user.isSuperuser && !hasPermission && !isMember -> pass
-  // console.log("🚀 ~ session.user.isSuperuser:", session.user.isSuperuser);
-  // console.log("🚀 ~ hasPermission:", hasPermission);
-  // console.log("🚀 ~ isMember:", isMember);
-  // console.log(
-  //   "🚀 ~ isBlocked:",
-  //   !session.user.isSuperuser && !hasPermission && !isMember,
-  // );
-  if (!session.user.isSuperuser && !hasPermission && !isMember) {
-    return hidden ? null : <ErrorForbiddenGraphic />;
+  if (!access) {
+    if (status === "UNAUTHENTICATED")
+      return hidden ? null : <ErrorUnauthorizedGraphic />;
+    if (status === "FORBIDDEN")
+      return hidden ? null : <ErrorForbiddenGraphic />;
+  } else {
+    return <>{children}</>;
   }
-
-  return <>{children}</>;
 }

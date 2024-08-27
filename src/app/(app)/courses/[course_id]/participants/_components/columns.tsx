@@ -8,7 +8,9 @@ import { DataTableColumnHeader } from "@/components/data-table/table-header";
 
 import { DataTableRowActions } from "./participants-table-row-actions";
 
-export function getColumns(): ColumnDef<CourseParticipant>[] {
+export function getColumns(
+  hasRowActionPermission = false,
+): ColumnDef<CourseParticipant>[] {
   return [
     {
       id: "select",
@@ -60,51 +62,6 @@ export function getColumns(): ColumnDef<CourseParticipant>[] {
         });
       },
     },
-    // {
-    //   accessorKey: "first_name",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="First Name" />
-    //   ),
-    //   cell: ({ row }) => (
-    //     <div className="max-w-[120px] truncate font-medium">
-    //       {row.getValue("first_name")}
-    //     </div>
-    //   ),
-    //   filterFn: (row, id, value: string[]) => {
-    //     return value.some((letter: string) => {
-    //       const rowValue = row.getValue<string>(id);
-    //       rowValue.toLowerCase().startsWith(letter.toLowerCase());
-    //     });
-    //   },
-    // },
-    // {
-    //   accessorKey: "last_name",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Last Name" />
-    //   ),
-    //   cell: ({ row }) => (
-    //     <div className="max-w-[120px] truncate font-medium">
-    //       {row.getValue("last_name")}
-    //     </div>
-    //   ),
-    //   filterFn: (row, id, value: string[]) => {
-    //     return value.some((letter: string) => {
-    //       const rowValue = row.getValue<string>(id); // Ensure rowValue is a string
-    //       return rowValue.toLowerCase().startsWith(letter.toLowerCase());
-    //     });
-    //   },
-    // },
-    // {
-    //   accessorKey: "handle",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="zID" />
-    //   ),
-    //   cell: ({ row }) => (
-    //     <div className="max-w-[100px] truncate font-medium">
-    //       {row.getValue("handle")}
-    //     </div>
-    //   ),
-    // },
     {
       accessorKey: "email",
       header: ({ column }) => (
@@ -142,9 +99,13 @@ export function getColumns(): ColumnDef<CourseParticipant>[] {
         return value.includes(row.getValue<string>(id));
       },
     },
-    {
-      id: "actions",
-      cell: ({ row }) => <DataTableRowActions row={row} />,
-    },
+    ...(hasRowActionPermission
+      ? [
+          {
+            id: "actions",
+            cell: ({ row }) => <DataTableRowActions row={row} />,
+          } as ColumnDef<CourseParticipant>,
+        ]
+      : []),
   ];
 }

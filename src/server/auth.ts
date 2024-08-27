@@ -166,3 +166,34 @@ export const checkCoursePermission = cache(
   async (userId: string, courseId: string, permissionSlug?: string) =>
     await hasCoursePermission(userId, courseId, permissionSlug),
 );
+
+type VerifyPermissionResult = {
+  access: boolean;
+  status?: "UNAUTHENTICATED" | "FORBIDDEN";
+};
+
+export const verifyProtectedPermission = async (
+  courseId: string,
+  permissionSlug: string,
+  hasMemberOverride = false,
+): Promise<VerifyPermissionResult> => {
+  const session = await getServerAuthSession();
+
+  if (!session || !session.user || !session.user.id) {
+    return { access: false, status: "UNAUTHENTICATED" };
+  }
+
+  const userId = session.user.id;
+
+  const hasPermission = await checkCoursePermission(
+    userId,
+    courseId,
+    permissionSlug,
+  );
+
+  if (!session.user.isSuperuser && !hasPermission && !hasMemberOverride) {
+    return { access: false, status: "FORBIDDEN" };
+  }
+
+  return { access: true };
+};

@@ -4,11 +4,11 @@ import {
   getCourseEnrollable,
   getCourseEnrolments,
 } from "@/server/api/crud/course-enrolments/queries";
+import { verifyProtectedPermission } from "@/server/auth";
 
 import { Separator } from "@/components/ui/separator";
 import { DataTableSkeleton } from "@/components/data-table/skeleton";
 
-import { EnrolParticipantsDialog } from "./_components/enrol-participants-dialog";
 import CourseParticipantsTable from "./_components/participants-table";
 
 export const metadata = {
@@ -24,6 +24,12 @@ interface CoursePageProps {
 export default async function CoursePage({ params }: CoursePageProps) {
   const { enrollable } = await getCourseEnrollable(params.course_id);
   const { participants } = await getCourseEnrolments(params.course_id);
+  const { access: hasManageEnrolmentsPermission } =
+    await verifyProtectedPermission(
+      params.course_id,
+      "course:manage_enrolments",
+    );
+
   return (
     <>
       <div className="space-y-2">
@@ -50,15 +56,10 @@ export default async function CoursePage({ params }: CoursePageProps) {
         <CourseParticipantsTable
           members={participants}
           candidates={enrollable}
+          hasRowActionPermission={hasManageEnrolmentsPermission}
+          hasToolbarActionPermission={hasManageEnrolmentsPermission}
         />
       </Suspense>
-      {/* <EnrolParticipantsDialog
-        courseId={params.course_id}
-        enrollableUsers={enrollable}
-      />
-      {participants.map((participant) => (
-        <p key={participant.id}>{participant.name}</p>
-      ))} */}
     </>
   );
 }
