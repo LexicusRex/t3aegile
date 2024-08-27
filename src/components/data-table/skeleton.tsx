@@ -132,6 +132,7 @@ export function DataTableSkeleton(props: DataTableSkeletonProps) {
                     style={{
                       width: cellWidths[j],
                       minWidth: shrinkZero ? cellWidths[j] : "auto",
+                      height: "3rem",
                     }}
                   >
                     <Skeleton className="h-6 w-full" />
