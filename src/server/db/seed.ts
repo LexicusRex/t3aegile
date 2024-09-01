@@ -35,7 +35,7 @@ for (const table of [
 }
 
 await seeds.user(db);
-await seeds.course(db);
+// await seeds.course(db);
 await seeds.permission(db);
 // await seeds.role(db);
 // await seeds.rolePermission(db);
