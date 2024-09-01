@@ -26,10 +26,10 @@ export default async function CourseLayout({
     <div className="flex flex-1 flex-col">
       <Protect
         courseId={params.course_id}
-        permissionSlug="course:view"
+        // permissionSlug=""
         isMember={isCourseMember}
       >
-        <div className="navbar-container">{navbar}</div>
+        <>{navbar}</>
         <main className="flex flex-1 flex-col p-4 pt-6 md:px-10">
           {children}
         </main>
