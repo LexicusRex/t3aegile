@@ -178,7 +178,6 @@ export function RolesPermissionsForm({
             </div>
           ))}
         </div>
-        {/* 
         <FormField
           control={form.control}
           name="mobile"
@@ -202,7 +201,7 @@ export function RolesPermissionsForm({
             </FormItem>
           )}
         />
-        <Button type="submit">Update permissions</Button> */}
+        <Button type="submit">Update permissions</Button>
       </form>
     </Form>
   );
