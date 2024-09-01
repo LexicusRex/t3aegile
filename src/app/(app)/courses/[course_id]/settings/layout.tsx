@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { PERM_COURSE_MANAGE_CORE } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import Protect from "@/components/protect";
 import { SettingsNav } from "@/components/settings-nav";
@@ -21,22 +22,29 @@ export default function CourseSettingsLayout({
     {
       title: "General",
       href: `/courses/${params.course_id}/settings`,
+      pattern: "/settings/?$",
     },
     {
       title: "Roles & Permissions",
       href: `/courses/${params.course_id}/settings/roles`,
+      pattern: "/settings/roles(/[^/]+)?$",
     },
     {
       title: "Preferences",
       href: `/courses/${params.course_id}/settings/preferences`,
+      pattern: "/settings/preferences(/[^/]+)?$",
     },
     {
       title: "Advanced",
       href: `/courses/${params.course_id}/settings/advanced`,
+      pattern: "/settings/advanced(/[^/]+)?$",
     },
   ];
   return (
-    <Protect courseId={params.course_id} permissionSlug="course:edit">
+    <Protect
+      courseId={params.course_id}
+      permissionSlug={PERM_COURSE_MANAGE_CORE}
+    >
       <div className="space-y-2">
         <h2 className="font-semibold leading-none tracking-tight">
           Course Settings
@@ -50,7 +58,7 @@ export default function CourseSettingsLayout({
         <aside className="sticky top-16 -mx-4 self-start lg:w-1/5">
           <SettingsNav items={settingsNavItems} />
         </aside>
-        <div className="flex-1 lg:max-w-2xl">{children}</div>
+        <div className="flex-1">{children}</div>
       </div>
     </Protect>
   );

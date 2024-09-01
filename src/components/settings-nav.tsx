@@ -10,6 +10,7 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
     href: string;
     title: string;
+    pattern?: string;
   }[];
 }
 
@@ -24,21 +25,25 @@ export function SettingsNav({ className, items, ...props }: SidebarNavProps) {
       )}
       {...props}
     >
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            buttonVariants({ variant: "ghost" }),
-            pathname === item.href
-              ? "bg-muted hover:bg-muted"
-              : "hover:bg-transparent hover:underline",
-            "justify-start",
-          )}
-        >
-          {item.title}
-        </Link>
-      ))}
+      {items.map((item) => {
+        const pattern = item.pattern ? new RegExp(item.pattern) : null;
+        const isActive = pattern ? pattern.test(pathname) : false;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              buttonVariants({ variant: "ghost" }),
+              // pathname.startsWith(item.href)
+              // pathname === item.href
+              isActive ? "bg-muted hover:bg-muted" : "",
+              "justify-start",
+            )}
+          >
+            {item.title}
+          </Link>
+        );
+      })}
     </nav>
   );
 }
