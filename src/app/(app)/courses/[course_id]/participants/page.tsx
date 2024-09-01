@@ -6,6 +6,7 @@ import {
 } from "@/server/api/crud/course-enrolments/queries";
 import { verifyProtectedPermission } from "@/server/auth";
 
+import { PERM_COURSE_MANAGE_ENROLMENTS } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import { DataTableSkeleton } from "@/components/data-table/skeleton";
 
@@ -27,7 +28,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   const { access: hasManageEnrolmentsPermission } =
     await verifyProtectedPermission(
       params.course_id,
-      "course:manage_enrolments",
+      PERM_COURSE_MANAGE_ENROLMENTS,
     );
 
   return (

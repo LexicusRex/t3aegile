@@ -1,10 +1,16 @@
 [
-  { "slug": "course:create" },
-  { "slug": "course:edit" },
-  { "slug": "course:delete" },
-  { "slug": "course:view" },
-  { "slug": "course:fetch_all" },
-  { "slug": "course:manage_enrolments" },
-  { "slug": "tutorial:manage_enrolments" },
-  { "slug": "tutorial:view" }
+  { "slug": "course:manage-core" },
+  { "slug": "course:manage-enrolments" },
+  { "slug": "role:manage" },
+  { "slug": "tutorial:manage-core" },
+  { "slug": "tutorial:manage-enrolments" },
+  { "slug": "tutorial:view" },
+  { "slug": "group:manage-core" },
+  { "slug": "group:manage-enrolments" },
+  { "slug": "group:manage-self-enrolment" },
+  { "slug": "group:view" },
+  { "slug": "assignment:manage-core" },
+  { "slug": "submission:submit" },
+  { "slug": "submission:view" },
+  { "slug": "submission:resubmit" }
 ]

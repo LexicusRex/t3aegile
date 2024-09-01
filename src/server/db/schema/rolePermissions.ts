@@ -6,7 +6,7 @@ import { z } from "zod";
 import { timestamps } from "@/lib/utils";
 
 import { ID_LENGTH } from "./config";
-import { permissions } from "./permission";
+import { permissionEnum, permissions, permissionsList } from "./permission";
 import { roles } from "./role";
 import { createTable, generateId } from "./util";
 
@@ -19,7 +19,7 @@ export const rolePermissions = createTable(
         onUpdate: "no action",
         onDelete: "cascade",
       }),
-    permission: varchar("permission_id", { length: 255 })
+    permission: permissionEnum("permission_id")
       .notNull()
       .references(() => permissions.slug, {
         onUpdate: "no action",
@@ -45,6 +45,8 @@ export const roleToPermissionRelations = relations(
   }),
 );
 
+export const PermissionEnum = z.enum(permissionsList);
+
 // Base schema for rolePermissions - used to validate API requests
 const baseRolePermissionSchema = createSelectSchema(rolePermissions);
 
@@ -55,10 +57,7 @@ export const insertRolePermissionParams = baseRolePermissionSchema.extend({
     .string()
     .min(1, { message: "Role ID is required." })
     .length(ID_LENGTH),
-  permission: z
-    .string()
-    .min(1, { message: "Permission slug is required." })
-    .length(255),
+  permission: PermissionEnum,
 });
 
 // Schema for updating a role-permission relationship (if necessary)
@@ -68,10 +67,7 @@ export const updateRolePermissionParams = baseRolePermissionSchema.extend({
     .string()
     .min(1, { message: "Role ID is required." })
     .length(ID_LENGTH),
-  permissionId: z
-    .string()
-    .min(1, { message: "Permission slug is required." })
-    .length(255),
+  permissionId: PermissionEnum,
 });
 
 // Types for rolePermissions - used to type API request params and within Components

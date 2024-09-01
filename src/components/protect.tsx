@@ -1,13 +1,14 @@
 import React, { type ReactNode } from "react";
 
 import { verifyProtectedPermission } from "@/server/auth";
+import type { PermissionSlug } from "@/server/db/schema/permission";
 
 import ErrorUnauthorizedGraphic from "@/components/common/error-401";
 import ErrorForbiddenGraphic from "@/components/common/error-403";
 
 interface ProtectProps {
   courseId: string;
-  permissionSlug: string;
+  permissionSlug?: PermissionSlug;
   isMember?: boolean;
   hidden?: boolean;
   children: ReactNode;

@@ -25,6 +25,8 @@ import GoogleProvider from "next-auth/providers/google";
 
 import { env } from "@/env";
 
+import type { PermissionSlug } from "./db/schema/permission";
+
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -130,7 +132,7 @@ export const testCall = async () => {
 export const hasCoursePermission = async (
   userId: string,
   courseId: string,
-  permissionSlug?: string,
+  permissionSlug?: PermissionSlug,
 ) => {
   if (!permissionSlug) return false;
   const prepared = db
@@ -163,7 +165,7 @@ export const hasCoursePermission = async (
 };
 
 export const checkCoursePermission = cache(
-  async (userId: string, courseId: string, permissionSlug?: string) =>
+  async (userId: string, courseId: string, permissionSlug?: PermissionSlug) =>
     await hasCoursePermission(userId, courseId, permissionSlug),
 );
 
@@ -174,7 +176,7 @@ type VerifyPermissionResult = {
 
 export const verifyProtectedPermission = async (
   courseId: string,
-  permissionSlug: string,
+  permissionSlug?: PermissionSlug,
   hasMemberOverride = false,
 ): Promise<VerifyPermissionResult> => {
   const session = await getServerAuthSession();
@@ -185,11 +187,9 @@ export const verifyProtectedPermission = async (
 
   const userId = session.user.id;
 
-  const hasPermission = await checkCoursePermission(
-    userId,
-    courseId,
-    permissionSlug,
-  );
+  const hasPermission = permissionSlug
+    ? await checkCoursePermission(userId, courseId, permissionSlug)
+    : false;
 
   if (!session.user.isSuperuser && !hasPermission && !hasMemberOverride) {
     return { access: false, status: "FORBIDDEN" };
