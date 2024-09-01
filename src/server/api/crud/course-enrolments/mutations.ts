@@ -1,7 +1,7 @@
 import "server-only";
 
-import { db } from "@/server/db/index";
-import { courseEnrolments, roles } from "@/server/db/schema";
+// import { db } from "@/server/db/index";
+import { courseEnrolments, courses } from "@/server/db/schema";
 import {
   courseEnrolmentIdSchema,
   insertCourseEnrolmentSchema,
@@ -11,7 +11,7 @@ import {
   type UpdateCourseEnrolmentParams,
 } from "@/server/db/schema/courseEnrolment";
 import type { DrizzleTransaction } from "@/server/db/types";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 import { getDefaultCourseRole } from "../roles/queries";
 
@@ -28,6 +28,10 @@ export const createCourseEnrolment = async (
       .insert(courseEnrolments)
       .values({ ...newEnrolment, roleId: defaultRoleId })
       .returning();
+    await tx
+      .update(courses)
+      .set({ memberCount: sql`member_count + 1` })
+      .where(eq(courses.id, newEnrolment.courseId));
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);
@@ -60,6 +64,10 @@ export const deleteCourseEnrolment = async (
 ) => {
   const { courseId, userId } = courseEnrolmentIdSchema.parse(enrolmentIds);
   try {
+    await tx
+      .update(courses)
+      .set({ memberCount: sql`member_count - 1` })
+      .where(eq(courses.id, courseId));
     await tx
       .delete(courseEnrolments)
       .where(

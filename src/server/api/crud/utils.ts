@@ -6,13 +6,13 @@ export const withTransaction = async <T>(
   fn: (tx: DrizzleTransaction) => Promise<T>,
 ) => {
   return await db.transaction(async (tx) => {
-    try {
-      return await fn(tx);
-    } catch (err) {
-      const message = (err as Error).message ?? "Error, please try again";
-      console.error(message);
-      throw { error: message, message };
-    }
+    // try {
+    return await fn(tx);
+    // } catch (err) {
+    //   const message = (err as Error).message ?? "Error, please try again";
+    //   console.error("[tx]", message);
+    //   throw { error: message, message };
+    // }
   });
 };
 

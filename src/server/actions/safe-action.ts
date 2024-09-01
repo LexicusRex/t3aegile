@@ -2,6 +2,8 @@ import { checkCoursePermission, getServerAuthSession } from "@/server/auth"; // 
 
 import { type CourseId } from "@/server/db/schema/course";
 
+import type { PermissionSlug } from "../db/schema/permission";
+
 type ActionFunction<T> = (input: T) => Promise<void | string>;
 
 const handleErrors = (e: unknown) => {
@@ -29,7 +31,7 @@ export const adminProtectedAction = <T>(
         throw new Error("User is unauthorized! Superuser access required.");
       }
 
-      return action(input);
+      return await action(input);
     } catch (e) {
       return handleErrors(e);
     }
@@ -39,7 +41,7 @@ export const adminProtectedAction = <T>(
 export const permissionProtectedAction = <T>(
   action: ActionFunction<T>,
   getCourseId: (input: T) => CourseId | null, // CourseId extractor
-  permissionSlug?: string, // Permission slug
+  permissionSlug?: PermissionSlug, // Permission slug
 ): ActionFunction<T> => {
   return async (input: T) => {
     try {
@@ -50,7 +52,7 @@ export const permissionProtectedAction = <T>(
       }
 
       if (session.user.isSuperuser) {
-        return action(input);
+        return await action(input);
       }
 
       const userId = session.user.id;
@@ -62,17 +64,14 @@ export const permissionProtectedAction = <T>(
         throw new Error("Course ID is required for permission check.");
       }
 
-      const hasPermission: boolean = await checkCoursePermission(
-        userId,
-        courseId,
-        permissionSlug,
-      );
+      const hasPermission: boolean = permissionSlug
+        ? await checkCoursePermission(userId, courseId, permissionSlug)
+        : false;
 
       if (!hasPermission) {
         throw new Error("User is unauthorized!");
       }
-
-      return action(input);
+      return await action(input);
     } catch (e) {
       return handleErrors(e);
     }

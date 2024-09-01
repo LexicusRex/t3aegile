@@ -22,41 +22,6 @@ import { and, eq, sql } from "drizzle-orm";
 import { createRole, enableRolePermission } from "../roles/mutations";
 import { defaultRoles } from "./default-roles";
 
-// export const createCourse = async (course: NewCourseParams) => {
-//   const newCourse = insertCourseSchema.parse(course);
-//   try {
-//     return await db.transaction(async (tx) => {
-//       // Insert the course
-//       const [crs] = await tx.insert(courses).values(newCourse).returning();
-
-//       // Attempt to initialize default roles
-//       try {
-//         await initDefaultRoles(crs!, tx);
-//       } catch (err) {
-//         console.error(
-//           "Failed to initialize roles, rolling back course creation.",
-//         );
-//         throw err; // Escalate the error to trigger a rollback of the course
-//       }
-
-//       return { course: crs };
-//     });
-//   } catch (err) {
-//     const message = (err as Error).message ?? "Error, please try again";
-//     console.error(message);
-//     throw { error: message };
-//   }
-//   // try {
-//   //   const [crs] = await db.insert(courses).values(newCourse).returning();
-//   //   await initDefaultRoles(crs!);
-//   //   return { course: crs };
-//   // } catch (err) {
-//   //   const message = (err as Error).message ?? "Error, please try again";
-//   //   console.error(message);
-//   //   throw { error: message };
-//   // }
-// };
-
 export const createCourse = async (
   course: NewCourseParams,
   tx: DrizzleTransaction,
@@ -89,7 +54,7 @@ export const updateCourse = async (
     return { course: c };
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
-    console.error(message);
+    // console.error("[db]", message);
     throw { error: message, message };
   }
 };

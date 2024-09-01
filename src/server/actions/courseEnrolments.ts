@@ -10,6 +10,8 @@ import {
   updateCourseEnrolment,
 } from "@/server/api/crud/course-enrolments/mutations";
 
+import { PERM_COURSE_MANAGE_ENROLMENTS } from "@/lib/constants";
+
 import { withTransaction } from "../api/crud/utils";
 import {
   courseEnrolmentIdSchema,
@@ -40,7 +42,7 @@ export const updateCourseEnrolmentAction = permissionProtectedAction(
     });
   },
   (input) => input.courseId,
-  "course:manage_enrolments",
+  PERM_COURSE_MANAGE_ENROLMENTS,
 );
 
 export const deleteCourseEnrolmentAction = permissionProtectedAction(
@@ -52,5 +54,5 @@ export const deleteCourseEnrolmentAction = permissionProtectedAction(
     });
   },
   (input) => input.courseId,
-  "course:manage_enrolments",
+  PERM_COURSE_MANAGE_ENROLMENTS,
 );
