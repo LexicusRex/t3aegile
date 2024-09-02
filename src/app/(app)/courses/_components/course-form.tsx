@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { FloatingAlert } from "@/components/forms/floating-alert";
 
 const CourseForm = ({
   course,
@@ -236,12 +237,35 @@ const CourseForm = ({
           {/* Schema fields end */}
 
           {/* Save Button */}
-          <SaveButton
-            errors={hasErrors}
-            editing={editing}
-            pending={form.formState.isSubmitting}
-            isDirty={form.formState.isDirty}
-          />
+          {editing ? (
+            <FloatingAlert isDirty={form.formState.isDirty}>
+              <div className="flex items-center gap-x-2">
+                <Button
+                  variant="ghost"
+                  className="text-muted-foreground"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    form.reset();
+                  }}
+                >
+                  Reset
+                </Button>
+                <SaveButton
+                  errors={hasErrors}
+                  editing={editing}
+                  pending={form.formState.isSubmitting}
+                  isDirty={form.formState.isDirty}
+                />
+              </div>
+            </FloatingAlert>
+          ) : (
+            <SaveButton
+              errors={hasErrors}
+              editing={editing}
+              pending={form.formState.isSubmitting}
+              isDirty={form.formState.isDirty}
+            />
+          )}
         </form>
       </Form>
       {editing ? (
@@ -302,12 +326,12 @@ const SaveButton = ({
   return (
     <Button
       type="submit"
-      className="mr-2"
+      // className="mr-2"
       disabled={isCreating || isUpdating || errors || !isDirty}
       aria-disabled={isCreating || isUpdating || errors}
     >
       {editing
-        ? `Sav${isUpdating ? "ing..." : "e"}`
+        ? `Sav${isUpdating ? "ing..." : "e Changes"}`
         : `Creat${isCreating ? "ing..." : "e"}`}
     </Button>
   );
