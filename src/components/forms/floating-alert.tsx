@@ -30,18 +30,13 @@ export const FloatingAlert = ({ isDirty, children }: FloatingAlertProps) => {
       <Alert
         className={cn(
           "w-full max-w-screen-lg p-3 transition-colors duration-300",
-          navigationAttempted && "animate-shake",
+          navigationAttempted && "animate-shake bg-red-200 dark:bg-red-950",
         )}
         variant={navigationAttempted ? "destructive" : "default"}
       >
         <div className="flex items-end justify-between">
           <div>
-            <AlertTitle
-              className={cn(
-                "text-base text-muted-foreground transition-colors duration-300",
-                navigationAttempted && "text-red-400",
-              )}
-            >
+            <AlertTitle className="text-base text-muted-foreground transition-colors duration-300">
               Careful - you have unsaved changes!
             </AlertTitle>
           </div>

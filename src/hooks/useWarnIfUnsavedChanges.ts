@@ -46,7 +46,8 @@ export const useWarnIfUnsavedChanges = (isDirty: boolean) => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
         e.preventDefault();
-        e.returnValue = true;
+        setNavigationAttempted(true);
+        e.returnValue = "";
       }
     };
     /* ********************************************************************* */
