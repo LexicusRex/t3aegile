@@ -5,6 +5,17 @@
 await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "www.learningenvironments.unsw.edu.au",
+        port: "",
+        pathname: "/sites/default/files/styles/teaser_desktop/public/images/**",
+      },
+    ],
+  },
+};
 
 export default config;
