@@ -37,7 +37,7 @@ export default async function AppLayout({
         {/* <main className="flex-1 overflow-y-auto p-8 pt-2 md:p-8"> */}
         <div className="flex flex-1 flex-col sm:pl-14 sm:pt-4">
           {/* <Navbar /> */}
-          <header className="sticky top-0 z-0 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+          <header className="sticky top-0 z-0 flex h-14 items-center gap-4 border-b bg-background px-4 py-px sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
             {/* <NavBarMobile /> */}
             <BreadcrumbPath />
             <div className="relative ml-auto flex-1 md:grow-0">
