@@ -107,6 +107,7 @@ const EnvSchema = z.object({
   GITHUB_CLIENT_SECRET: z.string(),
   DB_MIGRATING: stringBoolean,
   DB_SEEDING: stringBoolean,
+  SUPERUSER_EMAILS: z.string(),
 });
 
 expand(config());
@@ -145,6 +146,7 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     DB_MIGRATING: process.env.DB_MIGRATING,
     DB_SEEDING: process.env.DB_SEEDING,
+    SUPERUSER_EMAILS: process.env.SUPERUSER_EMAILS,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

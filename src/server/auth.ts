@@ -66,6 +66,18 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   },
+  events: {
+    createUser: async ({ user }) => {
+      if (!user?.email) return;
+      const superuserEmails = env.SUPERUSER_EMAILS.split(",");
+      if (superuserEmails.includes(user.email)) {
+        await db
+          .update(users)
+          .set({ isSuperuser: true })
+          .where(eq(users.id, user.id));
+      }
+    },
+  },
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,
