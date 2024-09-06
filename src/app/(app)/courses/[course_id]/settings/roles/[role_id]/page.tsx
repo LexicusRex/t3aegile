@@ -29,7 +29,10 @@ export default async function CourseSettingsPage({ params }: CoursePageProps) {
       </div>
       <Separator />
       <Suspense fallback={<Loading />}>
-        <RolesPermissionsForm permissions={permissions} />
+        <RolesPermissionsForm
+          roleId={params.role_id}
+          permissions={permissions}
+        />
       </Suspense>
     </div>
   );

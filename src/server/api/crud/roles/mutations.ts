@@ -1,4 +1,3 @@
-import { db } from "@/server/db/index";
 import {
   insertRoleSchema,
   roles,
@@ -45,18 +44,18 @@ export const enableRolePermission = async (
 
 export const disableRolePermission = async (
   rolePermission: NewRolePermission,
+  tx: DrizzleTransaction,
 ) => {
   const disabledPermission = insertRolePermissionSchema.parse(rolePermission);
   try {
-    await db
+    await tx
       .delete(rolePermissions)
       .where(
         and(
           eq(rolePermissions.roleId, disabledPermission.roleId),
           eq(rolePermissions.permission, disabledPermission.permission),
         ),
-      )
-      .returning();
+      );
   } catch (err) {
     handleError(err);
   }

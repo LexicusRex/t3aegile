@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
+import { useTransition } from "react";
 
+import { updateRolePermissionsAction } from "@/server/actions/roles";
 import type { PermissionSlug } from "@/server/db/schema/permission";
 import type { Role } from "@/server/db/schema/role";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,6 @@ import { z } from "zod";
 
 import * as constants from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -22,7 +21,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { FloatingAlert } from "@/components/forms/floating-alert";
 
@@ -69,22 +67,15 @@ const defaultValues: Partial<RolesPermissionsFormValues> = {
   [constants.PERM_SUBMISSION_RESUBMIT]: false,
 };
 
-const permissionFields = [
-  {
-    name: "Manage Core Course Settings",
-    slug: "course:manage-core",
-    description:
-      "Allow the role to edit course details, status, offering, dates and delete courses.",
-  },
-];
-
 export function RolesPermissionsForm({
-  role,
+  roleId,
   permissions,
 }: {
-  role?: Role;
+  roleId: string;
   permissions: Record<PermissionSlug, boolean>;
 }) {
+  const [pending, startMutation] = useTransition();
+
   const form = useForm<RolesPermissionsFormValues>({
     resolver: zodResolver(rolesPermissionsFormSchema),
     defaultValues: { ...defaultValues, ...permissions },
@@ -92,16 +83,36 @@ export function RolesPermissionsForm({
   });
 
   function onSubmit(data: RolesPermissionsFormValues) {
+    const dirtyFields = form.formState.dirtyFields;
+    const filteredData = Object.fromEntries(
+      Object.entries(data).filter(
+        ([key]) => dirtyFields[key as keyof RolesPermissionsFormValues],
+      ),
+    );
+
+    const payload = {
+      roleId,
+      permissions: filteredData,
+    };
+
     toast(
       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-        <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+        <code className="text-white">{JSON.stringify(payload, null, 2)}</code>
       </pre>,
     );
-  }
 
-  useEffect(() => {
-    console.log("🚀 ~ form.formState:", form.formState);
-  }, [form.formState]);
+    startMutation(async () => {
+      const error = await updateRolePermissionsAction(payload);
+      if (error) {
+        toast.error(`Failed to update`, {
+          description: error ?? "Error",
+        });
+      } else {
+        form.reset(data);
+        toast.success(`Role permissions updated!`);
+      }
+    });
+  }
 
   return (
     <Form {...form}>
@@ -152,24 +163,12 @@ export function RolesPermissionsForm({
             >
               Reset
             </Button>
-            <Button type="submit">Update permissions</Button>
+            <Button type="submit" disabled={pending}>
+              {pending ? "Updating..." : "Update permissions"}
+            </Button>
           </div>
         </FloatingAlert>
       </form>
     </Form>
   );
 }
-// pre-action
-// defaultValues: Object { "tutorial:view": true, "tutorial:manage-enrolments": true, "tutorial:manage-core": true }
-// dirtyFields: Object {  }
-// isDirty: false
-
-// toggle manage course enrolments on
-// defaultValues: Object { "tutorial:view": true, "tutorial:manage-enrolments": true, "tutorial:manage-core": true }
-//   "tutorial:manage-core": true
-//   "tutorial:manage-enrolments": true
-//   "tutorial:view": true
-// dirtyFields: Object { "course:manage-enrolments": true }
-// isDirty: true
-
-// form reset
