@@ -48,6 +48,9 @@ export const permissionRelations = relations(permissions, ({ many }) => ({
   roles: many(rolePermissions),
 }));
 
+
+export const PermissionEnum = z.enum(permissionsList);
+
 // Base schema for permissions - used to validate API requests
 const basePermissionSchema = createSelectSchema(permissions);
 
@@ -65,12 +68,8 @@ export const insertPermissionParams = basePermissionSchema.extend({
 // Schema for updating a permission
 export const updatePermissionSchema = basePermissionSchema;
 export const updatePermissionParams = basePermissionSchema.extend({
-  slug: z
-    .string()
-    .min(1, { message: "Permission slug is required." })
-    .max(255, {
-      message: "Permission slug must not exceed 255 characters.",
-    }),
+  roleId: z.string().min(1, { message: "Role ID is required." }),
+  permissions: z.record(z.boolean()),
 });
 
 // Schema for validating a permission slug
