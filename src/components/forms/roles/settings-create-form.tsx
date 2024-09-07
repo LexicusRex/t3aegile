@@ -12,6 +12,7 @@ import type { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -101,9 +102,11 @@ export function RoleCreationForm({ courseId }: { courseId: string }) {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" disabled={pending}>
-            {`Creat${pending ? "ing..." : "e"}`}
-          </Button>
+          <DialogClose asChild>
+            <Button type="submit" disabled={pending}>
+              {`Creat${pending ? "ing..." : "e"}`}
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
