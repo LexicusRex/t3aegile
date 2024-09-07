@@ -7,11 +7,10 @@ export default function TutorialsPage() {
     <>
       <div className="space-y-2">
         <h2 className="font-semibold leading-none tracking-tight">
-          Course Participants
+          Tutorial Classes
         </h2>
         <p className="text-sm text-muted-foreground">
-          View the participants of this course.
-          {/* The overview for {course?.term} {course?.code} - {course?.name}. */}
+          These are the classes you tutor.
         </p>
       </div>
       <Separator className="my-6" />
