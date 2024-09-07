@@ -1,29 +1,12 @@
 import { relations, sql } from "drizzle-orm";
-import { pgEnum, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgEnum, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import * as constants from "@/lib/constants";
+import { permissionsList } from "@/lib/constants";
 
 import { rolePermissions } from "./rolePermissions";
 import { createTable } from "./util";
-
-export const permissionsList: [string, ...string[]] = [
-  constants.PERM_COURSE_MANAGE_ENROLMENTS,
-  constants.PERM_COURSE_MANAGE_CORE,
-  constants.PERM_ROLE_MANAGE,
-  constants.PERM_TUTORIAL_MANAGE_CORE,
-  constants.PERM_TUTORIAL_MANAGE_ENROLMENTS,
-  constants.PERM_TUTORIAL_VIEW,
-  constants.PERM_GROUP_MANAGE_CORE,
-  constants.PERM_GROUP_MANAGE_ENROLMENTS,
-  constants.PERM_GROUP_MANAGE_SELF_ENROLMENT,
-  constants.PERM_GROUP_VIEW,
-  constants.PERM_ASSIGNMENT_MANAGE_CORE,
-  constants.PERM_SUBMISSION_SUBMIT,
-  constants.PERM_SUBMISSION_VIEW,
-  constants.PERM_SUBMISSION_RESUBMIT,
-];
 
 export const permissionEnum = pgEnum("slug", permissionsList);
 
@@ -47,7 +30,6 @@ export const permissions = createTable("permission", {
 export const permissionRelations = relations(permissions, ({ many }) => ({
   roles: many(rolePermissions),
 }));
-
 
 export const PermissionEnum = z.enum(permissionsList);
 

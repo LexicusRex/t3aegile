@@ -16,6 +16,7 @@ import {
   insertCourseEnrolmentSchema,
   type CourseEnrolment,
 } from "@/server/db/schema/courseEnrolment";
+import type { PermissionSlug } from "@/server/db/schema/permission";
 import type { DrizzleTransaction } from "@/server/db/types";
 import { and, eq, sql } from "drizzle-orm";
 
@@ -90,7 +91,7 @@ const initDefaultRoles = async (course: Course, tx: DrizzleTransaction) => {
         await enableRolePermission(
           {
             roleId: newRole?.id ?? "",
-            permission: permission,
+            permission: permission as PermissionSlug,
           },
           tx,
         );

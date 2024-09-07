@@ -1,11 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import {
-  boolean,
-  index,
-  timestamp,
-  unique,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { boolean, timestamp, unique, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -13,7 +7,7 @@ import { timestamps } from "@/lib/utils";
 
 import { ID_LENGTH } from "./config";
 import { courses } from "./course";
-import { rolePermissions } from "./rolePermissions";
+import { rolePermissions, updateRolePermissionParams } from "./rolePermissions";
 import { createTable, generateId } from "./util";
 
 export const roles = createTable(
@@ -29,7 +23,7 @@ export const roles = createTable(
         onUpdate: "no action",
         onDelete: "cascade",
       }),
-    isCourseDefault: boolean("is_course_default").default(false),
+    isCourseDefault: boolean("is_course_default").notNull().default(false),
     name: varchar("name", { length: 255 }).notNull(),
     createdAt: timestamp("created_at", {
       mode: "date",
@@ -71,6 +65,7 @@ export const updateRoleParams = baseRoleSchema.extend({
     message: "Role name must not exceed 255 characters.",
   }),
 });
+// .omit({ courseId: true });
 export const roleIdSchema = baseRoleSchema.pick({ id: true });
 
 // Types for roles - used to type API request params and within Components
@@ -79,6 +74,13 @@ export type NewRole = z.infer<typeof insertRoleSchema>;
 export type NewRoleParams = z.infer<typeof insertRoleParams>;
 export type UpdateRoleParams = z.infer<typeof updateRoleParams>;
 export type RoleId = z.infer<typeof roleIdSchema>["id"];
+
+export const updateRoleAndPermissionsParams = updateRolePermissionParams
+  .merge(updateRoleParams)
+  .omit({ roleId: true });
+export type UpdateRoleAndPermissionsParams = z.infer<
+  typeof updateRoleAndPermissionsParams
+>;
 
 // db.query.role.findMany({
 //   columns: {
