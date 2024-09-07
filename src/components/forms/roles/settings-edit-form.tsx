@@ -119,24 +119,32 @@ export function RolesPermissionsForm({
             <FormField
               control={form.control}
               name="isCourseDefault"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Set as Course Default
-                    </FormLabel>
-                    <FormDescription>
-                      Set this role as the course default.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={!!field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const isDisabled = role.isCourseDefault;
+                return (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel
+                        className={isDisabled ? "text-muted-foreground" : ""}
+                      >
+                        Set as Course Default
+                      </FormLabel>
+                      <FormDescription>
+                        {isDisabled
+                          ? "Current default role cannot be disabled. Please enable a different role."
+                          : "Set this role as the course default."}
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={!!field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={isDisabled}
+                      />
+                    </FormControl>
+                  </FormItem>
+                );
+              }}
             />
           </div>
           <Separator />
@@ -154,9 +162,7 @@ export function RolesPermissionsForm({
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">
-                            {permission.name}
-                          </FormLabel>
+                          <FormLabel>{permission.name}</FormLabel>
                           <FormDescription>
                             {permission.description}
                           </FormDescription>

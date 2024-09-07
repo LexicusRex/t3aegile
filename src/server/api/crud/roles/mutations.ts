@@ -34,6 +34,18 @@ export const updateRole = async (
 ) => {
   const parsedRole = updateRoleSchema.parse(role);
   try {
+    if (parsedRole.isCourseDefault) {
+      // set all other roles to not be course default
+      await tx
+        .update(roles)
+        .set({ isCourseDefault: false })
+        .where(
+          and(
+            eq(roles.courseId, parsedRole.courseId),
+            eq(roles.isCourseDefault, true),
+          ),
+        );
+    }
     await tx.update(roles).set(parsedRole).where(eq(roles.id, role.id));
   } catch (err) {
     handleError(err);
