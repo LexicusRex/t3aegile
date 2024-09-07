@@ -1,7 +1,9 @@
 import {
   insertRoleSchema,
   roles,
+  updateRoleSchema,
   type NewRoleParams,
+  type UpdateRoleParams,
 } from "@/server/db/schema/role";
 import {
   insertRolePermissionSchema,
@@ -21,6 +23,18 @@ export const createRole = async (
   try {
     const [r] = await tx.insert(roles).values(newRole).returning();
     return { ...r };
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const updateRole = async (
+  role: UpdateRoleParams,
+  tx: DrizzleTransaction,
+) => {
+  const parsedRole = updateRoleSchema.parse(role);
+  try {
+    await tx.update(roles).set(parsedRole).where(eq(roles.id, role.id));
   } catch (err) {
     handleError(err);
   }

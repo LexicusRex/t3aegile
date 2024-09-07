@@ -1,16 +1,17 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import { updateRolePermissionsAction } from "@/server/actions/roles";
 import type { PermissionSlug } from "@/server/db/schema/permission";
-import type { Role } from "@/server/db/schema/role";
+import { updateRoleAndPermissionsParams } from "@/server/db/schema/role";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import type { z } from "zod";
 
-import * as constants from "@/lib/constants";
+import { permissionsList } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,78 +22,55 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { FloatingAlert } from "@/components/forms/floating-alert";
 
 import permissionsSettingsFormStructure from "./permission-settings-form";
 
-const rolesPermissionsFormSchema = z.object({
-  // type: z.enum(["all", "mentions", "none"], {
-  //   required_error: "You need to select a notification type.",
-  // }),
-  // mobile: z.boolean().default(false),
-  [constants.PERM_COURSE_MANAGE_ENROLMENTS]: z.boolean().default(false),
-  [constants.PERM_COURSE_MANAGE_CORE]: z.boolean().default(false),
-  [constants.PERM_ROLE_MANAGE]: z.boolean().default(false),
-  [constants.PERM_TUTORIAL_MANAGE_CORE]: z.boolean().default(false),
-  [constants.PERM_TUTORIAL_MANAGE_ENROLMENTS]: z.boolean().default(false),
-  [constants.PERM_TUTORIAL_VIEW]: z.boolean().default(false),
-  [constants.PERM_GROUP_MANAGE_CORE]: z.boolean().default(false),
-  [constants.PERM_GROUP_MANAGE_ENROLMENTS]: z.boolean().default(false),
-  [constants.PERM_GROUP_MANAGE_SELF_ENROLMENT]: z.boolean().default(false),
-  [constants.PERM_GROUP_VIEW]: z.boolean().default(false),
-  [constants.PERM_ASSIGNMENT_MANAGE_CORE]: z.boolean().default(false),
-  [constants.PERM_SUBMISSION_SUBMIT]: z.boolean().default(false),
-  [constants.PERM_SUBMISSION_VIEW]: z.boolean().default(false),
-  [constants.PERM_SUBMISSION_RESUBMIT]: z.boolean().default(false),
-});
+type RoleAndPermissionsFormValues = z.infer<
+  typeof updateRoleAndPermissionsParams
+>;
 
-type RolesPermissionsFormValues = z.infer<typeof rolesPermissionsFormSchema>;
-
-// This can come from your database or API.
-const defaultValues: Partial<RolesPermissionsFormValues> = {
-  [constants.PERM_COURSE_MANAGE_ENROLMENTS]: false,
-  [constants.PERM_COURSE_MANAGE_CORE]: false,
-  [constants.PERM_ROLE_MANAGE]: false,
-  [constants.PERM_TUTORIAL_MANAGE_CORE]: false,
-  [constants.PERM_TUTORIAL_MANAGE_ENROLMENTS]: false,
-  [constants.PERM_TUTORIAL_VIEW]: false,
-  [constants.PERM_GROUP_MANAGE_CORE]: false,
-  [constants.PERM_GROUP_MANAGE_ENROLMENTS]: false,
-  [constants.PERM_GROUP_MANAGE_SELF_ENROLMENT]: false,
-  [constants.PERM_GROUP_VIEW]: false,
-  [constants.PERM_ASSIGNMENT_MANAGE_CORE]: false,
-  [constants.PERM_SUBMISSION_SUBMIT]: false,
-  [constants.PERM_SUBMISSION_VIEW]: false,
-  [constants.PERM_SUBMISSION_RESUBMIT]: false,
-};
-
+// Update the form to use the combined schema
 export function RolesPermissionsForm({
-  roleId,
+  courseId,
+  role,
   permissions,
 }: {
-  roleId: string;
+  courseId: string;
+  role: { id: string; name: string; isCourseDefault: boolean };
   permissions: Record<PermissionSlug, boolean>;
 }) {
-  const [pending, startMutation] = useTransition();
+  const router = useRouter();
 
-  const form = useForm<RolesPermissionsFormValues>({
-    resolver: zodResolver(rolesPermissionsFormSchema),
-    defaultValues: { ...defaultValues, ...permissions },
+  const [pending, startMutation] = useTransition();
+  const defaultPermissions = Object.fromEntries(
+    permissionsList.map((permission) => [
+      permission,
+      permissions[permission] ?? false,
+    ]),
+  );
+  const form = useForm<RoleAndPermissionsFormValues>({
+    resolver: zodResolver(updateRoleAndPermissionsParams),
+    defaultValues: {
+      courseId,
+      ...role,
+      permissions: defaultPermissions as Record<PermissionSlug, boolean>,
+    },
     mode: "onChange",
   });
 
-  function onSubmit(data: RolesPermissionsFormValues) {
-    const dirtyFields = form.formState.dirtyFields;
-    const filteredData = Object.fromEntries(
-      Object.entries(data).filter(
-        ([key]) => dirtyFields[key as keyof RolesPermissionsFormValues],
-      ),
-    );
-
+  function onSubmit(data: RoleAndPermissionsFormValues) {
+    const dirtyPermissions = form.formState.dirtyFields.permissions;
     const payload = {
-      roleId,
-      permissions: filteredData,
+      ...data,
+      permissions: Object.fromEntries(
+        Object.entries(data.permissions).filter(
+          ([key]) => dirtyPermissions?.[key as PermissionSlug],
+        ),
+      ),
     };
 
     toast(
@@ -110,6 +88,7 @@ export function RolesPermissionsForm({
       } else {
         form.reset(data);
         toast.success(`Role permissions updated!`);
+        router.refresh();
       }
     });
   }
@@ -117,7 +96,50 @@ export function RolesPermissionsForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="space-y-8 pb-6">
+        <div className="space-y-8 pb-12">
+          <div className="space-y-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      {...field}
+                      placeholder="Enter role name"
+                    />
+                  </FormControl>
+                  <FormDescription>Edit the name of the role</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="isCourseDefault"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Set as Course Default
+                    </FormLabel>
+                    <FormDescription>
+                      Set this role as the course default.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={!!field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <Separator />
           {permissionsSettingsFormStructure.map((section) => (
             <div key={section.name}>
               <h3 className="mb-2 text-sm font-medium">{section.name}</h3>
@@ -126,7 +148,9 @@ export function RolesPermissionsForm({
                   <FormField
                     key={permission.slug}
                     control={form.control}
-                    name={permission.slug as keyof RolesPermissionsFormValues}
+                    name={
+                      `permissions.${permission.slug}` as keyof RoleAndPermissionsFormValues
+                    }
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">

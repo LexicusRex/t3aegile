@@ -4,7 +4,22 @@ import { courseIdSchema, type CourseId } from "@/server/db/schema/course";
 import type { PermissionSlug } from "@/server/db/schema/permission";
 import { roleIdSchema, type RoleId } from "@/server/db/schema/role";
 import type { DrizzleTransaction } from "@/server/db/types";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
+
+export const getRoleById = async (roleId: RoleId) => {
+  const { id } = roleIdSchema.parse({ id: roleId });
+  const [r] = await db
+    .select({
+      id: roles.id,
+      name: roles.name,
+      isCourseDefault: roles.isCourseDefault,
+    })
+    .from(roles)
+    .where(eq(roles.id, id))
+    .limit(1);
+
+  return { role: r };
+};
 
 export const getDefaultCourseRole = async (
   courseId: CourseId,
@@ -28,7 +43,8 @@ export const getCourseRoles = async (
   const courseRoles = await (tx ?? db)
     .select({ id: roles.id, name: roles.name })
     .from(roles)
-    .where(eq(roles.courseId, id));
+    .where(eq(roles.courseId, id))
+    .orderBy(asc(roles.createdAt));
 
   return { roles: courseRoles };
 };
