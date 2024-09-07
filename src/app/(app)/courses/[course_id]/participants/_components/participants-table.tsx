@@ -6,9 +6,9 @@ import type {
   CourseEnrollable,
   CourseParticipant,
 } from "@/server/api/crud/course-enrolments/types";
-import { ShieldCheckIcon, UserIcon, UserPlusIcon } from "lucide-react";
 
 import type { DataTableFilterField } from "@/lib/types";
+import { capitalize } from "@/lib/utils";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/toolbar";
@@ -21,31 +21,15 @@ interface MembersTableProps {
   candidates: CourseEnrollable[];
   hasRowActionPermission: boolean;
   hasToolbarActionPermission: boolean;
+  roles?: { id: string; name: string }[];
 }
-
-const roles = [
-  {
-    value: "admin",
-    label: "Admin",
-    icon: ShieldCheckIcon,
-  },
-  {
-    value: "tutor",
-    label: "Tutor",
-    icon: UserPlusIcon,
-  },
-  {
-    value: "student",
-    label: "Student",
-    icon: UserIcon,
-  },
-];
 
 export default function CourseParticipantsTable({
   members,
   candidates,
   hasRowActionPermission,
   hasToolbarActionPermission,
+  roles = [],
 }: MembersTableProps) {
   const columns = React.useMemo(
     () => getColumns(hasRowActionPermission),
@@ -61,7 +45,8 @@ export default function CourseParticipantsTable({
       label: "Roles",
       value: "role",
       options: roles.map((role) => ({
-        ...role,
+        label: capitalize(role.name),
+        value: role.name,
         withCount: true,
       })),
     },

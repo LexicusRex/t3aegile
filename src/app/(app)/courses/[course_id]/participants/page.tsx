@@ -4,6 +4,7 @@ import {
   getCourseEnrollable,
   getCourseEnrolments,
 } from "@/server/api/crud/course-enrolments/queries";
+import { getCourseRoles } from "@/server/api/crud/roles/queries";
 import { verifyProtectedPermission } from "@/server/auth";
 
 import { PERM_COURSE_MANAGE_ENROLMENTS } from "@/lib/constants";
@@ -25,6 +26,9 @@ interface CoursePageProps {
 export default async function CoursePage({ params }: CoursePageProps) {
   const { enrollable } = await getCourseEnrollable(params.course_id);
   const { participants } = await getCourseEnrolments(params.course_id);
+
+  const { roles } = await getCourseRoles(params.course_id);
+
   const { access: hasManageEnrolmentsPermission } =
     await verifyProtectedPermission(
       params.course_id,
@@ -59,6 +63,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
           candidates={enrollable}
           hasRowActionPermission={hasManageEnrolmentsPermission}
           hasToolbarActionPermission={hasManageEnrolmentsPermission}
+          roles={roles}
         />
       </Suspense>
     </>
