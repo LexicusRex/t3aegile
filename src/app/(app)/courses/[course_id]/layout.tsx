@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
+import { notFound } from "next/navigation";
 
-import { checkCourseEnrolment } from "@/server/api/crud/courses/queries";
+import {
+  checkCourseEnrolment,
+  getCourseById,
+} from "@/server/api/crud/courses/queries";
 import { getServerAuthSession } from "@/server/auth";
 
 import Protect from "@/components/protect";
@@ -22,6 +26,8 @@ export default async function CourseLayout({
     ? await checkCourseEnrolment(session?.user?.id, params.course_id)
     : false;
 
+  const { course } = await getCourseById(params.course_id);
+  if (!course) return notFound();
   return (
     <div className="flex flex-1 flex-col">
       <Protect
