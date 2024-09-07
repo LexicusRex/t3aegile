@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { getCourseRoles } from "@/server/api/crud/roles/queries";
 
 import { PERM_ROLE_MANAGE } from "@/lib/constants";
+import { Separator } from "@/components/ui/separator";
+import { RoleCreationForm } from "@/components/forms/roles/settings-create-form";
 import Protect from "@/components/protect";
 import { SettingsNav } from "@/components/settings-nav";
 
@@ -39,6 +41,8 @@ export default async function CourseSettingsLayout({
         <div className="w-full flex-1 lg:max-w-2xl">{children}</div>
         <aside className="sticky top-16 -mx-4 self-start lg:w-1/5">
           <SettingsNav items={settingsNavItems} />
+          <Separator className="my-2" />
+          <RoleCreationForm courseId={params.course_id} />
         </aside>
       </div>
     </Protect>

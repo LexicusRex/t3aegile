@@ -1,11 +1,15 @@
 import { Suspense } from "react";
+import { notFound } from "next/navigation";
 
-import { getRolePermissions } from "@/server/api/crud/roles/queries";
+import {
+  getRoleById,
+  getRolePermissions,
+} from "@/server/api/crud/roles/queries";
 
 import { Separator } from "@/components/ui/separator";
+// import { RolesPermissionsForm } from "./RolePermissionsForm";
+import { RolesPermissionsForm } from "@/components/forms/roles/settings-edit-form";
 import Loading from "@/app/(app)/loading";
-
-import { RolesPermissionsForm } from "./RolePermissionsForm";
 
 interface CoursePageProps {
   params: {
@@ -16,6 +20,8 @@ interface CoursePageProps {
 
 export default async function CourseSettingsPage({ params }: CoursePageProps) {
   const { permissions } = await getRolePermissions(params.role_id);
+  const { role } = await getRoleById(params.role_id);
+  if (!role) return notFound();
 
   return (
     <div className="space-y-6 lg:max-w-2xl">
@@ -30,7 +36,8 @@ export default async function CourseSettingsPage({ params }: CoursePageProps) {
       <Separator />
       <Suspense fallback={<Loading />}>
         <RolesPermissionsForm
-          roleId={params.role_id}
+          courseId={params.course_id}
+          role={role}
           permissions={permissions}
         />
       </Suspense>
