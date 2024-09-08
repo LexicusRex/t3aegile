@@ -2,7 +2,7 @@ import "server-only";
 
 import { db } from "@/server/db/index";
 import { courseEnrolments } from "@/server/db/schema";
-import { userIdSchema, users, type UserId } from "@/server/db/schema/auth";
+import { users } from "@/server/db/schema/auth";
 import {
   courseIdSchema,
   courses,

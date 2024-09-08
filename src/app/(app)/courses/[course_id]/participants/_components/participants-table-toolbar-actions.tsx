@@ -6,7 +6,6 @@ import type {
   CourseEnrollable,
   CourseParticipant,
 } from "@/server/api/crud/course-enrolments/types";
-import { DownloadIcon } from "@radix-ui/react-icons";
 import { type Table } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";

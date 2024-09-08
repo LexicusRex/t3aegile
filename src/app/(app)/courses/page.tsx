@@ -65,18 +65,18 @@ const Courses = async () => {
   //   {/* <CourseList courses={courses} /> */}
 };
 
-const EmptyState = () => {
-  return (
-    <div className="text-center">
-      <h3 className="mt-2 text-sm font-semibold text-secondary-foreground">
-        No courses
-      </h3>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Get started by creating a new course.
-      </p>
-      <div className="mt-6">
-        <CourseCreationDialog />
-      </div>
-    </div>
-  );
-};
+// const EmptyState = () => {
+//   return (
+//     <div className="text-center">
+//       <h3 className="mt-2 text-sm font-semibold text-secondary-foreground">
+//         No courses
+//       </h3>
+//       <p className="mt-1 text-sm text-muted-foreground">
+//         Get started by creating a new course.
+//       </p>
+//       <div className="mt-6">
+//         <CourseCreationDialog />
+//       </div>
+//     </div>
+//   );
+// };

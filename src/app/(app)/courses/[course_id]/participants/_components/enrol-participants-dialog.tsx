@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
-import { useParams, useRouter } from "next/navigation";
+import React, { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import { createCourseEnrolmentAction } from "@/server/actions/courseEnrolments";
 import type { CourseEnrollable } from "@/server/api/crud/course-enrolments/types";
 import { Users } from "lucide-react";
 import { toast } from "sonner";
-import * as z from "zod";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -103,9 +101,10 @@ export function EnrolParticipantsDialog({
               <Button
                 variant="outline"
                 className="ml-auto"
+                disabled={pending}
                 onClick={() => enrolUser(user.id)}
               >
-                Add
+                Add{pending ? "ing..." : ""}
               </Button>
             </div>
           ))}

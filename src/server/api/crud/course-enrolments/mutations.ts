@@ -24,10 +24,9 @@ export const createCourseEnrolment = async (
     const defaultRoleId = await getDefaultCourseRole(newEnrolment.courseId, tx);
     if (!defaultRoleId) throw new Error("Default role not found");
 
-    const [enr] = await tx
+    await tx
       .insert(courseEnrolments)
-      .values({ ...newEnrolment, roleId: defaultRoleId })
-      .returning();
+      .values({ ...newEnrolment, roleId: defaultRoleId });
     await tx
       .update(courses)
       .set({ memberCount: sql`member_count + 1` })
@@ -45,12 +44,10 @@ export const updateCourseEnrolment = async (
 ) => {
   const updatedEnrolment = updateCourseEnrolmentSchema.parse(enrolment);
   try {
-    const [enr] = await tx
+    await tx
       .update(courseEnrolments)
       .set({ ...updatedEnrolment, updatedAt: new Date() })
-      .where(eq(courseEnrolments.courseId, updatedEnrolment.courseId))
-      .returning();
-    // return { course: c };
+      .where(eq(courseEnrolments.courseId, updatedEnrolment.courseId));
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);

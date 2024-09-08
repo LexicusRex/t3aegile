@@ -8,7 +8,7 @@ import {
   KanbanSquareIcon,
   ListTodoIcon,
   MessagesSquareIcon,
-  Package2Icon,
+  // Package2Icon,
   SettingsIcon,
   UserIcon,
 } from "lucide-react";

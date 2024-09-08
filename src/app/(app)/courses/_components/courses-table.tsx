@@ -11,12 +11,7 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
-import {
-  BookOpenIcon,
-  CalendarIcon,
-  SearchIcon,
-  UsersIcon,
-} from "lucide-react";
+import { BookOpenIcon, SearchIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

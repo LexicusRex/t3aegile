@@ -5,7 +5,6 @@ import { db } from "@/server/db";
 import {
   accounts,
   courseEnrolments,
-  permissions,
   rolePermissions,
   sessions,
   users,

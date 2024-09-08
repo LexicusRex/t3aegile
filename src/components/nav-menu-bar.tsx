@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { cn } from "@/lib/utils";
+// import { cn } from "@/lib/utils";
 // import {
 //   NavigationMenu,
 //   NavigationMenuContent,
@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 //   NavigationMenuList,
 //   NavigationMenuTrigger,
 // } from "@/components/ui/navigation-menu";
-import LogoOutline from "@/components/aegile/logo-outline";
+// import LogoOutline from "@/components/aegile/logo-outline";
 
 type pageLinks = {
   title: string;
