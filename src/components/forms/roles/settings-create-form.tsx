@@ -99,15 +99,15 @@ export function RoleCreationForm({ courseId }: { courseId: string }) {
                 </FormItem>
               )}
             />
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="submit" disabled={pending}>
+                  {`Creat${pending ? "ing..." : "e"}`}
+                </Button>
+              </DialogClose>
+            </DialogFooter>
           </form>
         </Form>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button type="submit" disabled={pending}>
-              {`Creat${pending ? "ing..." : "e"}`}
-            </Button>
-          </DialogClose>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
