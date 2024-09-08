@@ -3,6 +3,7 @@ import {
   roles,
   updateRoleSchema,
   type NewRoleParams,
+  type RoleId,
   type UpdateRoleParams,
 } from "@/server/db/schema/role";
 import {
@@ -47,6 +48,23 @@ export const updateRole = async (
         );
     }
     await tx.update(roles).set(parsedRole).where(eq(roles.id, role.id));
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const deleteRole = async (id: RoleId, tx: DrizzleTransaction) => {
+  try {
+    // check if role is course default
+    const [role] = await tx
+      .select()
+      .from(roles)
+      .where(eq(roles.id, id))
+      .limit(1);
+    if (role?.isCourseDefault) {
+      throw new Error("Cannot delete default coruse role");
+    }
+    await tx.delete(roles).where(eq(roles.id, id));
   } catch (err) {
     handleError(err);
   }

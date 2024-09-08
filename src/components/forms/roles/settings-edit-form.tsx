@@ -96,7 +96,7 @@ export function RolesPermissionsForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="space-y-8 pb-12">
+        <div className="space-y-8">
           <div className="space-y-6">
             <FormField
               control={form.control}

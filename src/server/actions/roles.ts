@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 
 import {
   createRole,
+  deleteRole,
   disableRolePermission,
   enableRolePermission,
   updateRole,
@@ -18,8 +19,10 @@ import { withTransaction } from "../api/crud/utils";
 import type { PermissionSlug } from "../db/schema/permission";
 import {
   insertRoleParams,
+  roleIdSchema,
   updateRoleAndPermissionsParams,
   type NewRoleParams,
+  type RoleId,
   type UpdateRoleAndPermissionsParams,
 } from "../db/schema/role";
 import {
@@ -61,3 +64,10 @@ export const updateRolePermissionsAction = adminProtectedAction(
     });
   },
 );
+
+export const deleteRoleAction = adminProtectedAction(async (input: RoleId) => {
+  const payload = roleIdSchema.parse({ id: input });
+  await withTransaction(async (tx) => {
+    await deleteRole(payload.id, tx);
+  });
+});

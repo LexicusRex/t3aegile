@@ -7,7 +7,7 @@ import {
 } from "@/server/api/crud/roles/queries";
 
 import { Separator } from "@/components/ui/separator";
-// import { RolesPermissionsForm } from "./RolePermissionsForm";
+import RoleSettingsDeleteForm from "@/components/forms/roles/settings-delete-form";
 import { RolesPermissionsForm } from "@/components/forms/roles/settings-edit-form";
 import Loading from "@/app/(app)/loading";
 
@@ -35,11 +35,14 @@ export default async function CourseSettingsPage({ params }: CoursePageProps) {
       </div>
       <Separator />
       <Suspense fallback={<Loading />}>
-        <RolesPermissionsForm
-          courseId={params.course_id}
-          role={role}
-          permissions={permissions}
-        />
+        <div className="space-y-8 pb-12">
+          <RolesPermissionsForm
+            courseId={params.course_id}
+            role={role}
+            permissions={permissions}
+          />
+          <RoleSettingsDeleteForm roleId={params.role_id} />
+        </div>
       </Suspense>
     </div>
   );
