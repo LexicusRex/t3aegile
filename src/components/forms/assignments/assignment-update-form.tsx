@@ -3,10 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import {
-  deleteAssignmentAction,
-  updateAssignmentAction,
-} from "@/server/actions/assignments";
+import { updateAssignmentAction } from "@/server/actions/assignments";
 import {
   updateAssignmentParams,
   type Assignment,
@@ -19,18 +16,7 @@ import { toast } from "sonner";
 import type { z } from "zod";
 
 import { cn } from "@/lib/utils";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
@@ -50,7 +36,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { TimePickerFields } from "@/components/datetime-picker/time-picker-fields";
 import { FloatingAlert } from "@/components/forms/floating-alert";
-import { useBackPath } from "@/components/shared/back-button";
 
 interface AssignmentUpdateFormProps {
   assignment: Assignment;
@@ -65,7 +50,6 @@ export default function AssignmentUpdateForm({
 }: AssignmentUpdateFormProps) {
   const [pending, startMutation] = useTransition();
   const router = useRouter();
-  const backpath = useBackPath(assignment.id);
 
   const form = useForm<AssignmentUpdateFormValues>({
     resolver: zodResolver(updateAssignmentParams),
@@ -101,7 +85,7 @@ export default function AssignmentUpdateForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8"
+        className="space-y-4"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
@@ -177,63 +161,6 @@ export default function AssignmentUpdateForm({
             </FormItem>
           )}
         />
-        <div className="space-y-2">
-          <h3 className="font-semibold leading-none tracking-tight text-destructive">
-            Danger Zone
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Permanently delete this course and all associated data.
-          </p>
-        </div>
-        <Separator />
-        {/* Delete Button */}
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive">Delete Assignment</Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-destructive">
-                Are you absolutely sure?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete this
-                assignment and remove all its related data from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                asChild
-                className={buttonVariants({ variant: "destructive" })}
-              >
-                <Button
-                  type="button"
-                  disabled={pending}
-                  variant="destructive"
-                  onClick={() => {
-                    startMutation(async () => {
-                      const error = await deleteAssignmentAction({
-                        courseId: assignment.courseId,
-                        id: assignment.id,
-                      });
-                      if (error) {
-                        toast.error(`Failed to delete`, {
-                          description: error ?? "Error",
-                        });
-                      } else {
-                        toast.success(`Assignment deleted!`);
-                        router.push(backpath);
-                      }
-                    });
-                  }}
-                >
-                  Delet{pending ? "ing..." : "e"}
-                </Button>
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
         <FloatingAlert isDirty={form.formState.isDirty}>
           <div className="flex items-center gap-x-2">
             <Button
