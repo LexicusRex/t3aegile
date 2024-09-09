@@ -92,6 +92,11 @@ export const updateCourseParams = baseSchema.extend({
   description: z.string().optional(),
 });
 export const courseIdSchema = baseSchema.pick({ id: true });
+// .extend({
+//   id: z.string().regex(/^crs_[a-zA-Z0-9]{${ID_LENGTH-4}}$/, {
+//     message: "Invalid course ID format.",
+//   }),
+// });
 
 // Types for courses - used to type API request params and within Components
 export type Course = typeof courses.$inferSelect;
