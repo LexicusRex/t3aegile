@@ -5,16 +5,17 @@ import { notFound } from "next/navigation";
 import { getAssignmentsByCourse } from "@/server/api/crud/assignments/queries";
 import type { Assignment } from "@/server/db/schema/assignment";
 import { formatDistanceToNow } from "date-fns";
+import { LockIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -106,6 +107,10 @@ function AssignmentItem({
   assignment: Assignment;
 }) {
   const selected = assignmentId === assignment.id;
+  // if assignment.availableAt is in the future, show a lock icon, otherwise add a small pulse indicator
+  const isActive =
+    assignment.availableAt && assignment.availableAt < new Date();
+
   return (
     <Link
       href={`/courses/${courseId}/assignments/${assignment.id}`}
@@ -123,6 +128,11 @@ function AssignmentItem({
             {/* {!assignment.read && (
               <span className="flex h-2 w-2 rounded-full bg-blue-600" />
             )} */}
+            {isActive ? (
+              <span className="h-2 w-2 animate-pulse rounded-full bg-blue-300" />
+            ) : (
+              <LockIcon className="h-3 w-3 text-gray-400 opacity-50" />
+            )}
           </div>
           <div
             className={cn(
