@@ -49,24 +49,30 @@ export const insertAssignmentParams = baseAssignmentSchema.pick({
   courseId: true,
 });
 
-export const updateAssignmentSchema = baseAssignmentSchema.omit({
+export const updateAssignmentSchema = baseAssignmentSchema;
+export const updateAssignmentParams = baseAssignmentSchema.extend({
+  name: z.string().min(1, { message: "Assignment name is required." }),
+  weighting: z
+    .number()
+    .int()
+    .min(0, { message: "Weighting must be a positive integer." })
+    .max(100, { message: "Weighting must be less than or equal to 100." }),
+  availableAt: z.date().nullable(),
+  editorId: z.string().nullable(),
+});
+
+export const deleteAssignmentSchema = baseAssignmentSchema.pick({
+  id: true,
   courseId: true,
 });
-export const updateAssignmentParams = baseAssignmentSchema
-  .extend({
-    name: z.string().min(1, { message: "Assignment name is required." }),
-    weighting: z
-      .number()
-      .int()
-      .min(0, { message: "Weighting must be a positive integer." })
-      .max(100, { message: "Weighting must be less than or equal to 100." }),
-    availableAt: z.date().nullable(),
-    editorId: z.string().nullable(),
-  })
-  .omit({ courseId: true });
+export const deleteAssignmentParams = baseAssignmentSchema.pick({
+  id: true,
+  courseId: true,
+});
 
 export const assignmentIdSchema = baseAssignmentSchema.pick({ id: true });
 export type Assignment = z.infer<typeof baseAssignmentSchema>;
 export type NewAssignmentParams = z.infer<typeof insertAssignmentParams>;
 export type UpdateAssignmentParams = z.infer<typeof updateAssignmentParams>;
+export type DeleteAssignmentParams = z.infer<typeof deleteAssignmentParams>;
 export type AssignmentId = z.infer<typeof assignmentIdSchema>["id"];

@@ -1,8 +1,32 @@
+import { notFound } from "next/navigation";
+
+import { getAssignmentById } from "@/server/api/crud/assignments/queries";
 import { ClipboardList } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
+import AssignmentUpdateForm from "@/components/forms/assignments/assignment-update-form";
 
-export default function AssignmentsPage() {
+interface AssignmentPageProps {
+  params: { course_id: string; assignment_id?: string[] };
+}
+
+export default async function AssignmentPage({ params }: AssignmentPageProps) {
+  // if params doesn't have an assignment_id, show an empty state
+  if (!params.assignment_id) return <AssignmentsEmptyState />;
+  if (params.assignment_id.length > 1) return notFound();
+
+  const assignmentId = params.assignment_id?.[0] ?? "";
+  const { assignment } = await getAssignmentById(assignmentId);
+  if (!assignment) return notFound();
+
+  return (
+    <>
+      <AssignmentUpdateForm assignment={assignment} editing={true} />
+    </>
+  );
+}
+
+function AssignmentsEmptyState() {
   return (
     <div className="mx-auto flex grow flex-col items-center justify-center p-6 text-center">
       <div className="relative">

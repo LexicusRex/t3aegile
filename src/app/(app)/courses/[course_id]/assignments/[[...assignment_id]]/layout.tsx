@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { getAssignmentsByCourse } from "@/server/api/crud/assignments/queries";
 import type { Assignment } from "@/server/db/schema/assignment";
+import { formatDistanceToNow } from "date-fns";
 
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,7 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NewAssignmentButton from "./_components/new-assignment-button";
 
 interface AssignmentsLayoutProps {
-  params: { course_id: string };
+  params: { course_id: string; assignment_id?: string[] };
   children: ReactNode;
 }
 
@@ -28,7 +30,6 @@ export default async function AssignmentsLayout({
   children,
 }: AssignmentsLayoutProps) {
   const { assignments } = await getAssignmentsByCourse(params.course_id);
-  console.log("🚀 ~ assignments:", assignments);
 
   return (
     <>
@@ -60,30 +61,25 @@ export default async function AssignmentsLayout({
             </TabsList>
             <TabsContent value="ongoing">
               <ScrollArea className="h-[calc(100vh-8rem)]">
-                {assignments.map((assignment) => (
-                  <AssignmentItem key={assignment.id} assignment={assignment} />
-                ))}
-                <NewAssignmentButton courseId={params.course_id} />
-                {/* <AssignmentInboxList
-                items={items.filter((item) => !item.archived)}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              <AssignmentCreationDialog /> */}
+                <div className="flex flex-col gap-2 py-2">
+                  {assignments.map((assignment) => (
+                    <AssignmentItem
+                      key={assignment.id}
+                      assignmentId={params.assignment_id?.[0]}
+                      courseId={params.course_id}
+                      assignment={assignment}
+                    />
+                  ))}
+                  <NewAssignmentButton courseId={params.course_id} />
+                </div>
               </ScrollArea>
             </TabsContent>
             <TabsContent value="archived">
-              <ScrollArea className="h-[calc(100vh-8rem)]">
-                {/* <AssignmentInboxList
-                items={items.filter((item) => item.archived)}
-                selected={selected}
-                setSelected={setSelected}
-              /> */}
-              </ScrollArea>
+              <ScrollArea className="h-[calc(100vh-8rem)]"></ScrollArea>
             </TabsContent>
           </Tabs>
         </div>
-        <div className="mx-3 hidden w-[1px] shrink-0 bg-zinc-200 dark:bg-zinc-800 lg:block" />
+        <div className="mx-6 hidden w-[1px] shrink-0 bg-zinc-200 dark:bg-zinc-800 lg:block" />
         {/* <Select onValueChange={() => router.push}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Theme" />
@@ -100,26 +96,45 @@ export default async function AssignmentsLayout({
   );
 }
 
-function AssignmentItem({ assignment }: { assignment: Assignment }) {
+function AssignmentItem({
+  assignmentId,
+  courseId,
+  assignment,
+}: {
+  assignmentId?: string;
+  courseId: string;
+  assignment: Assignment;
+}) {
+  const selected = assignmentId === assignment.id;
   return (
     <Link
-      href={`assignments/${assignment.id}`}
+      href={`/courses/${courseId}/assignments/${assignment.id}`}
       className={cn(
         "flex w-full flex-col items-start gap-2 rounded-lg border bg-background/80 p-3 text-left text-sm transition-all duration-300 hover:shadow-md",
+        selected && "border-primary/30 shadow-md",
       )}
     >
       <div className="flex w-full flex-col gap-1">
         <div className="flex items-center">
           <div className="flex items-center gap-2">
-            <div className="font-semibold">{assignment.name}</div>
+            <div className="font-semibold">
+              {assignment.name ?? "Untitled Assignment"}
+            </div>
             {/* {!assignment.read && (
               <span className="flex h-2 w-2 rounded-full bg-blue-600" />
             )} */}
           </div>
-          <div className={cn("ml-auto text-xs")}>
-            {/* {formatDistanceToNow(new Date(assignment.deadline), {
-              addSuffix: true,
-            })} */}
+          <div
+            className={cn(
+              "ml-auto text-xs",
+              selected ? "text-foreground" : "text-muted-foreground",
+            )}
+          >
+            {assignment.nextDeadline
+              ? formatDistanceToNow(new Date(assignment.nextDeadline), {
+                  addSuffix: true,
+                })
+              : "No deadline"}
           </div>
         </div>
         {/* <div className="text-xs font-medium">{assignment.variant}</div> */}

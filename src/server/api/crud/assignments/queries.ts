@@ -29,6 +29,5 @@ export const getAssignmentsByCourse = async (courseId: CourseId) => {
         // lt(assignments.availableAt, new Date()),
       ),
     );
-  console.log("🚀 ~ getAssignmentsByCourse ~ cas:", cas);
   return { assignments: cas };
 };

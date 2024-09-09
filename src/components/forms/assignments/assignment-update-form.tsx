@@ -1,7 +1,12 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
+import {
+  deleteAssignmentAction,
+  updateAssignmentAction,
+} from "@/server/actions/assignments";
 import {
   updateAssignmentParams,
   type Assignment,
@@ -14,7 +19,18 @@ import { toast } from "sonner";
 import type { z } from "zod";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
@@ -31,8 +47,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import { TimePickerFields } from "@/components/datetime-picker/time-picker-fields";
 import { FloatingAlert } from "@/components/forms/floating-alert";
+import { useBackPath } from "@/components/shared/back-button";
 
 interface AssignmentUpdateFormProps {
   assignment: Assignment;
@@ -46,11 +64,14 @@ export default function AssignmentUpdateForm({
   editing,
 }: AssignmentUpdateFormProps) {
   const [pending, startMutation] = useTransition();
+  const router = useRouter();
+  const backpath = useBackPath(assignment.id);
+
   const form = useForm<AssignmentUpdateFormValues>({
     resolver: zodResolver(updateAssignmentParams),
     defaultValues: {
       ...assignment,
-      name: assignment.name ?? undefined,
+      name: assignment.name ?? "Untitled Assignment",
     },
     mode: "onChange",
   });
@@ -63,22 +84,30 @@ export default function AssignmentUpdateForm({
     );
 
     startMutation(async () => {
-      // const error = await updateRolePermissionsAction(payload);
-      // if (error) {
-      //   toast.error(`Failed to update`, {
-      //     description: error ?? "Error",
-      //   });
-      // } else {
-      //   form.reset(data);
-      //   toast.success(`Role permissions updated!`);
-      //   router.refresh();
-      // }
+      const error = await updateAssignmentAction(data);
+      if (error) {
+        toast.error(`Failed to update`, {
+          description: error ?? "Error",
+        });
+      } else {
+        form.reset(data);
+        toast.success(`Assignment updated!`);
+        router.refresh();
+      }
     });
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+          }
+        }}
+      >
         <FormField
           control={form.control}
           name="name"
@@ -86,17 +115,17 @@ export default function AssignmentUpdateForm({
             <FormItem>
               {/* {<FormLabel>Role Name</FormLabel>} */}
               <FormControl>
-                <div className="flex items-center space-x-2">
+                <div className="group flex items-center space-x-2">
                   <Input
                     type="text"
                     {...field}
                     placeholder="Assignment Title"
-                    className="border-0 border-border px-0 text-2xl font-medium shadow-none focus-visible:ring-0"
+                    className="border-0 border-border px-0 text-2xl font-medium shadow-none placeholder:text-gray-300 focus-visible:ring-0"
                   />
-                  <PencilIcon className="h-5 w-5 text-gray-400 opacity-30 transition-opacity duration-200 ease-in-out hover:opacity-100" />
+                  <PencilIcon className="h-5 w-5 text-gray-400 opacity-30 transition-opacity duration-200 ease-in-out group-hover:opacity-100" />
                 </div>
               </FormControl>
-              {/* <FormDescription>Edit the assignment name</FormDescription> */}
+              <FormDescription>Click to edit</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -141,10 +170,70 @@ export default function AssignmentUpdateForm({
                   </div>
                 </PopoverContent>
               </Popover>
+              <FormDescription>
+                The datetime at which the assignment will be active & viewable
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+        <div className="space-y-2">
+          <h3 className="font-semibold leading-none tracking-tight text-destructive">
+            Danger Zone
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Permanently delete this course and all associated data.
+          </p>
+        </div>
+        <Separator />
+        {/* Delete Button */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive">Delete Assignment</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-destructive">
+                Are you absolutely sure?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this
+                assignment and remove all its related data from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                asChild
+                className={buttonVariants({ variant: "destructive" })}
+              >
+                <Button
+                  type="button"
+                  disabled={pending}
+                  variant="destructive"
+                  onClick={() => {
+                    startMutation(async () => {
+                      const error = await deleteAssignmentAction({
+                        courseId: assignment.courseId,
+                        id: assignment.id,
+                      });
+                      if (error) {
+                        toast.error(`Failed to delete`, {
+                          description: error ?? "Error",
+                        });
+                      } else {
+                        toast.success(`Assignment deleted!`);
+                        router.push(backpath);
+                      }
+                    });
+                  }}
+                >
+                  Delet{pending ? "ing..." : "e"}
+                </Button>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <FloatingAlert isDirty={form.formState.isDirty}>
           <div className="flex items-center gap-x-2">
             <Button
