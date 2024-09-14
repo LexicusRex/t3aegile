@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
 import { getAssignmentsByCourse } from "@/server/api/crud/assignments/queries";
+import { verifyProtectedPermission } from "@/server/auth";
 import type { Assignment } from "@/server/db/schema/assignment";
 import { formatDistanceToNow } from "date-fns";
 import { LockIcon } from "lucide-react";
 
+import { PERM_ASSIGNMENT_MANAGE_CORE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 // import {
@@ -31,7 +32,11 @@ export default async function AssignmentsLayout({
   children,
 }: AssignmentsLayoutProps) {
   const { assignments } = await getAssignmentsByCourse(params.course_id);
-
+  const { access: hasViewInactiveAssingmentPermission } =
+    await verifyProtectedPermission(
+      params.course_id,
+      PERM_ASSIGNMENT_MANAGE_CORE,
+    );
   return (
     <>
       <div className="space-y-2">
@@ -63,14 +68,24 @@ export default async function AssignmentsLayout({
             <TabsContent value="ongoing">
               <ScrollArea className="h-[calc(100vh-8rem)]">
                 <div className="flex flex-col gap-2 py-2">
-                  {assignments.map((assignment) => (
-                    <AssignmentItem
-                      key={assignment.id}
-                      assignmentId={params.assignment_id?.[0]}
-                      courseId={params.course_id}
-                      assignment={assignment}
-                    />
-                  ))}
+                  {assignments.map((assignment) => {
+                    const isActive =
+                      assignment.availableAt &&
+                      assignment.availableAt < new Date();
+
+                    if (!isActive && !hasViewInactiveAssingmentPermission) {
+                      return null;
+                    }
+
+                    return (
+                      <AssignmentItem
+                        key={assignment.id}
+                        assignmentId={params.assignment_id?.[0]}
+                        courseId={params.course_id}
+                        assignment={assignment}
+                      />
+                    );
+                  })}
                   <NewAssignmentButton courseId={params.course_id} />
                 </div>
               </ScrollArea>
@@ -131,7 +146,7 @@ function AssignmentItem({
             {isActive ? (
               <span className="h-2 w-2 animate-pulse rounded-full bg-blue-300" />
             ) : (
-              <LockIcon className="h-3 w-3 text-gray-400 opacity-50" />
+              <LockIcon className="h-3 w-3 text-gray-500 opacity-50" />
             )}
           </div>
           <div
