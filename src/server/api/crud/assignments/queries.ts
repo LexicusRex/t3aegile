@@ -5,7 +5,7 @@ import {
   type AssignmentId,
 } from "@/server/db/schema/assignment";
 import type { CourseId } from "@/server/db/schema/course";
-import { and, eq, lt } from "drizzle-orm";
+import { and, asc, eq, lt } from "drizzle-orm";
 
 export const getAssignmentById = async (assignmentId: AssignmentId) => {
   const { id } = assignmentIdSchema.parse({ id: assignmentId });
@@ -28,6 +28,7 @@ export const getAssignmentsByCourse = async (courseId: CourseId) => {
         eq(assignments.courseId, courseId),
         // lt(assignments.availableAt, new Date()),
       ),
-    );
+    )
+    .orderBy(asc(assignments.availableAt));
   return { assignments: cas };
 };
