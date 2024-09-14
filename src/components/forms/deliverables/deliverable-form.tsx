@@ -131,6 +131,7 @@ export function DeliverableForm({
                     type="number"
                     {...field}
                     placeholder="Enter weighting"
+                    onChange={(e) => field.onChange(Number(e.target.value))}
                   />
                 </FormControl>
                 <FormDescription>

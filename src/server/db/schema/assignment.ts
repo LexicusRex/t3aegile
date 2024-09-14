@@ -51,12 +51,13 @@ export const insertAssignmentParams = baseAssignmentSchema.pick({
 
 export const updateAssignmentSchema = baseAssignmentSchema;
 export const updateAssignmentParams = baseAssignmentSchema.extend({
-  name: z.string().min(1, { message: "Assignment name is required." }),
+  name: z.string().min(1, "Assignment name is required."),
   weighting: z
     .number()
     .int()
-    .min(0, { message: "Weighting must be a positive integer." })
-    .max(100, { message: "Weighting must be less than or equal to 100." }),
+    .refine((val: number) => {
+      return val >= 0 && val <= 100;
+    }, "Weighting must be an integer between 0 and 100."),
   availableAt: z.date().nullable(),
   editorId: z.string().nullable(),
 });

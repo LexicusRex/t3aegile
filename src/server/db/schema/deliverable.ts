@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { numeric, text, timestamp, unique, varchar } from "drizzle-orm/pg-core";
+import { integer, text, timestamp, unique, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -28,16 +28,16 @@ export const deliverables = createTable(
     availableAt: timestamp("available_at", {
       mode: "date",
       withTimezone: true,
-    }),
+    }).notNull(),
     deadline: timestamp("deadline", {
       mode: "date",
       withTimezone: true,
-    }),
+    }).notNull(),
     cutoff: timestamp("cutoff", {
       mode: "date",
       withTimezone: true,
-    }),
-    weighting: numeric("weighting").notNull().default("0"),
+    }).notNull(),
+    weighting: integer("weighting").notNull().default(0),
     createdAt: timestamp("created_at", {
       mode: "date",
       withTimezone: true,
@@ -45,7 +45,9 @@ export const deliverables = createTable(
     updatedAt: timestamp("updated_at", {
       mode: "date",
       withTimezone: true,
-    }).default(sql`CURRENT_TIMESTAMP`),
+    })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .$onUpdate(() => new Date()),
   },
   (t) => ({ uniqueAssignmentDeliverable: unique().on(t.assignmentId, t.name) }),
 );
@@ -55,40 +57,76 @@ const baseDeliverableSchema = createSelectSchema(deliverables).omit(timestamps);
 export const insertDeliverableSchema = createInsertSchema(deliverables);
 export const insertDeliverableParams = baseDeliverableSchema
   .extend({
-    name: z.string().min(1, { message: "Deliverable name is required." }),
-    weighting: z.string().refine(
-      (val) => {
-        const num = Number(val);
-        return !isNaN(num) && Number.isInteger(num) && num >= 0 && num <= 100;
-      },
-      { message: "Weighting must be an integer between 0 and 100." },
-    ),
-    availableAt: z.date().nullable(),
-    deadline: z.date().nullable(),
-    cutoff: z.date().nullable(),
+    name: z.string().min(1, "Deliverable name is required."),
+    weighting: z
+      .number()
+      .int()
+      .refine((val: number) => {
+        return val >= 0 && val <= 100;
+      }, "Weighting must be an integer between 0 and 100."),
+    availableAt: z.date(),
+    deadline: z.date(),
+    cutoff: z.date(),
     courseId: z.string(),
   })
-  .omit({ id: true });
+  .omit({ id: true })
+  .refine(
+    (data) => {
+      const now = new Date();
+      return data.deadline > now;
+    },
+    {
+      message: "The deadline must be in the future",
+      path: ["deadline"],
+    },
+  )
+  .refine((data) => data.deadline > data.availableAt, {
+    message: "The deadline must be after the available date",
+    path: ["deadline"],
+  })
+  .refine((data) => data.cutoff >= data.deadline, {
+    message: "The cutoff must be on or after the deadline",
+    path: ["cutoff"],
+  });
 
 export const updateDeliverableSchema = baseDeliverableSchema;
-export const updateDeliverableParams = baseDeliverableSchema.extend({
-  name: z.string().min(1, { message: "Deliverable name is required." }),
-  weighting: z.string().refine(
-    (val) => {
-      const num = Number(val);
-      return !isNaN(num) && Number.isInteger(num) && num >= 0 && num <= 100;
+export const updateDeliverableParams = baseDeliverableSchema
+  .extend({
+    name: z.string().min(1, "Deliverable name is required."),
+    weighting: z
+      .number()
+      .int()
+      .refine((val: number) => {
+        return val >= 0 && val <= 100;
+      }, "Weighting must be an integer between 0 and 100."),
+    availableAt: z.date(),
+    deadline: z.date(),
+    cutoff: z.date(),
+    courseId: courseIdSchema.shape.id,
+  })
+  .refine(
+    (data) => {
+      const now = new Date();
+      return data.deadline > now;
     },
-    { message: "Weighting must be an integer between 0 and 100." },
-  ),
-  availableAt: z.date().nullable(),
-  deadline: z.date().nullable(),
-  cutoff: z.date().nullable(),
-  courseId: courseIdSchema.shape.id,
-});
+    {
+      message: "The deadline must be in the future",
+      path: ["deadline"],
+    },
+  )
+  .refine((data) => data.deadline > data.availableAt, {
+    message: "The deadline must be after the available date",
+    path: ["deadline"],
+  })
+  .refine((data) => data.cutoff >= data.deadline, {
+    message: "The cutoff must be on or after the deadline",
+    path: ["cutoff"],
+  });
 
 export const deleteDeliverableSchema = baseDeliverableSchema
   .pick({
     id: true,
+    assignmentId: true,
   })
   .extend({
     courseId: courseIdSchema.shape.id,

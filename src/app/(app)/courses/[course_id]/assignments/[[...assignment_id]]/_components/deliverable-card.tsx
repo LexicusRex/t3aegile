@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { format } from "date-fns";
 import { FileIcon } from "lucide-react";
 
 // import { formatDatetimeFormal } from "@/lib/datetime";
@@ -20,7 +21,7 @@ import {
 type DeliverableCardProps = {
   id: string;
   name: string;
-  weighting: string;
+  weighting: number;
   deadline: Date | null;
   description?: string | null;
   status: string;
@@ -45,6 +46,9 @@ export default function DeliverableCard({
         </CardTitle>
         <CardDescription className="space-y-2 font-semibold">
           {weighting}% · Due:{" "}
+          {deadline
+            ? format(deadline, "eee, dd MMM, yyyy - hh:mm a")
+            : "No deadline"}
           {/* <ClientDateTime variant="formal" datetime={deadline} /> */}
         </CardDescription>
       </CardHeader>
