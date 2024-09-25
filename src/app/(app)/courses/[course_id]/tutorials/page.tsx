@@ -1,8 +1,18 @@
+import { api } from "@/trpc/server";
+
 import { Separator } from "@/components/ui/separator";
 
 import ClassesGrid from "./_components/classes-grid";
 
-export default function TutorialsPage() {
+export default async function TutorialsPage({
+  params,
+}: {
+  params: { course_id: string };
+}) {
+  const { tutorials } = await api.tutorial.getAllByCourseId({
+    courseId: params.course_id,
+  });
+
   return (
     <>
       <div className="space-y-2">
@@ -15,7 +25,7 @@ export default function TutorialsPage() {
       </div>
       <Separator className="my-6" />
       <div className="grid flex-grow grid-cols-1 gap-6 tabular-nums xl:grid-cols-3">
-        <ClassesGrid />
+        <ClassesGrid tutorials={tutorials} />
         <div className="border border-cyan-500"></div>
       </div>
     </>
