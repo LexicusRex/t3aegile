@@ -4,4 +4,5 @@ export { permissions } from "./permission";
 export { roles, roleRelations } from "./role";
 export { rolePermissions, roleToPermissionRelations } from "./rolePermissions";
 export { courseEnrolments, courseEnrolmentRelations } from "./courseEnrolment";
+export { tutorials } from "./tutorial";
 export { posts } from "./post";
