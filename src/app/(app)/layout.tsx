@@ -73,7 +73,7 @@ export default async function AppLayout({
               </DropdownMenuContent>
             </DropdownMenu>
           </header>
-          <main className="flex flex-1 flex-col bg-muted/20 dark:bg-muted/10">
+          <main className="flex flex-1 flex-col bg-muted/40 dark:bg-muted/30">
             {children}
           </main>
         </div>
