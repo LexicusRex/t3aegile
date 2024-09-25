@@ -6,7 +6,7 @@ import type { PermissionSlug } from "../db/schema/permission";
 
 type ActionFunction<T> = (input: T) => Promise<void | string>;
 
-const handleErrors = (e: unknown) => {
+export const handleErrors = (e: unknown) => {
   const errMsg = "Error, please try again.";
   if (e instanceof Error) return e.message.length > 0 ? e.message : errMsg;
   if (e && typeof e === "object" && "error" in e) {
