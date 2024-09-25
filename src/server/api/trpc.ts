@@ -7,12 +7,13 @@
  * need to use are documented accordingly near the end.
  */
 
+import { checkCoursePermission, getServerAuthSession } from "@/server/auth";
+import { db } from "@/server/db";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 
-import { getServerAuthSession } from "@/server/auth";
-import { db } from "@/server/db";
+import type { PermissionSlug } from "../db/schema/permission";
 
 /**
  * 1. CONTEXT
@@ -131,3 +132,40 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+export const perrmissionProtectedProcedure = (permissionSlug: PermissionSlug) =>
+  t.procedure
+    .use(timingMiddleware)
+    .input(z.object({ courseId: z.string() }).passthrough())
+    .use(async ({ ctx, input, next }) => {
+      // Ensure user is authenticated
+      if (!ctx.session || !ctx.session.user) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const courseId = input.courseId;
+
+      if (ctx.session.user.isSuperuser) {
+        return next({
+          ctx: { session: { ...ctx.session, user: ctx.session.user } },
+        });
+      }
+
+      // Check if the user has the required permission for the course
+      const hasPermission = await checkCoursePermission(
+        ctx.session.user.id,
+        courseId,
+        permissionSlug,
+      );
+
+      if (!hasPermission) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have permission to access this resource",
+        });
+      }
+
+      return next({
+        ctx: { session: { ...ctx.session, user: ctx.session.user } },
+      });
+    });
