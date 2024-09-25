@@ -16,18 +16,7 @@ import { z } from "zod";
 
 import { type Action } from "@/lib/utils";
 import { useValidatedForm } from "@/hooks/useValidatedForm";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -46,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertDeleteDialog } from "@/components/forms/alert-delete-dialog";
 import { FloatingAlert } from "@/components/forms/floating-alert";
 
 const CourseForm = ({
@@ -55,7 +45,7 @@ const CourseForm = ({
   course?: Course | null;
   closeDialog?: () => void;
 }) => {
-  const { errors, hasErrors, setErrors, handleChange } =
+  const { hasErrors, setErrors, handleChange } =
     useValidatedForm<Course>(insertCourseParams);
   const editing = !!course?.id;
 
@@ -280,7 +270,7 @@ const CourseForm = ({
           </div>
           <Separator />
           {/* Delete Button */}
-          <AlertDeleteDialog>
+          <AlertDeleteDialog itemType="course">
             <Button
               type="button"
               disabled={isDeleting || pending || hasErrors}
@@ -334,35 +324,5 @@ const SaveButton = ({
         ? `Sav${isUpdating ? "ing..." : "e Changes"}`
         : `Creat${isCreating ? "ing..." : "e"}`}
     </Button>
-  );
-};
-
-const AlertDeleteDialog = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive">Delete Course</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-destructive">
-            Are you absolutely sure?
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this
-            course and remove all course associated data from our servers.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            asChild
-            className={buttonVariants({ variant: "destructive" })}
-          >
-            {children}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   );
 };
