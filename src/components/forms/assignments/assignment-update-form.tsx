@@ -9,15 +9,12 @@ import {
   type Assignment,
 } from "@/server/db/schema/assignment";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { CalendarIcon, PencilIcon } from "lucide-react";
+import { PencilIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -28,13 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { TimePickerFields } from "@/components/datetime-picker/time-picker-fields";
+import { DateTimeFormPicker } from "@/components/date-time-picker/form/date-time-picker";
 import { FloatingAlert } from "@/components/forms/floating-alert";
 
 interface AssignmentUpdateFormProps {
@@ -120,7 +111,8 @@ export default function AssignmentUpdateForm({
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel className="text-left">Available At</FormLabel>
-              <Popover>
+              <DateTimeFormPicker field={field} />
+              {/* <Popover>
                 <FormControl>
                   <PopoverTrigger asChild>
                     <Button
@@ -153,7 +145,7 @@ export default function AssignmentUpdateForm({
                     />
                   </div>
                 </PopoverContent>
-              </Popover>
+              </Popover> */}
               <FormDescription>
                 The datetime at which the assignment will be active & viewable
               </FormDescription>

@@ -16,11 +16,9 @@ import {
   type UpdateTutorialParams,
 } from "@/server/db/schema/tutorial";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ClockIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { cn } from "@/lib/utils";
 import { useHandleFormMutation } from "@/hooks/use-handle-form-mutation";
 import { useValidatedForm } from "@/hooks/useValidatedForm";
 import { Button } from "@/components/ui/button";
@@ -34,14 +32,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { TimePickerFields } from "@/components/datetime-picker/time-picker-fields";
+import { TimeFormPicker } from "@/components/date-time-picker/form/time-picker";
 import { FloatingAlert } from "@/components/forms/floating-alert";
 
 import { AlertDeleteDialog } from "../alert-delete-dialog";
@@ -217,7 +210,8 @@ export const TutorialForm = ({
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Start time</FormLabel>
-                  <Popover modal={true}>
+                  <TimeFormPicker field={field} />
+                  {/* <Popover modal={true}>
                     <FormControl>
                       <PopoverTrigger asChild>
                         <Button
@@ -256,7 +250,7 @@ export const TutorialForm = ({
                         }
                       />
                     </PopoverContent>
-                  </Popover>
+                  </Popover> */}
                   <FormDescription>Tutorial&apos;s start time</FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -268,47 +262,8 @@ export const TutorialForm = ({
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Start time</FormLabel>
-                  <Popover modal={true}>
-                    <FormControl>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "h-9 w-[180px] justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground",
-                          )}
-                        >
-                          <ClockIcon className="mr-2 h-4 w-4" />
-                          {field.value ? (
-                            new Date(
-                              `1970-01-01T${field.value}`,
-                            ).toLocaleTimeString("en-US", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: true,
-                            })
-                          ) : (
-                            <span>Pick a time</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                    </FormControl>
-                    <PopoverContent className="w-auto">
-                      <TimePickerFields
-                        setDate={(time?: Date) => {
-                          const datetime = time ?? new Date();
-                          datetime.setSeconds(0);
-                          field.onChange(datetime.toTimeString().split(" ")[0]);
-                        }}
-                        date={
-                          field.value
-                            ? new Date(`1970-01-01T${field.value}`)
-                            : new Date()
-                        }
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>Tutorial&apos;s start time</FormDescription>
+                  <TimeFormPicker field={field} />
+                  <FormDescription>Tutorial&apos;s end time</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
