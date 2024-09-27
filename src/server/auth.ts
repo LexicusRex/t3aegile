@@ -131,7 +131,7 @@ export const checkAuth = async () => {
   const session = await getServerAuthSession();
   // await promise that takes 1 second
   // if (!session) throw new Error("Not authenticated");
-  if (!session) redirect("/api/auth/signin");
+  if (!session) redirect("/login");
 };
 
 export const testCall = async () => {

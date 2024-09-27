@@ -14,7 +14,7 @@ export default async function Home() {
         </pre>
       ) : null}
       <Button asChild>
-        <Link href={session ? "/api/auth/signout" : "/api/auth/signin"}>
+        <Link href={session ? "/logout" : "/login"}>
           {session ? "Sign out" : "Sign in"}
         </Link>
       </Button>

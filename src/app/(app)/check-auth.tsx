@@ -8,7 +8,7 @@ export default function CheckAuth() {
   const pathname = usePathname();
 
   useEffect(() => {
-    router.push(`/api/auth/signin?callbackUrl=${pathname}`);
+    router.push(`/login?from=${pathname}`);
   }, [pathname, router]);
   return <>Loading...</>;
 }
