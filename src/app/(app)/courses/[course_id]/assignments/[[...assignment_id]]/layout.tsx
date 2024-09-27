@@ -137,7 +137,12 @@ function AssignmentItem({
       <div className="flex w-full flex-col gap-1">
         <div className="flex items-center">
           <div className="flex items-center gap-2">
-            <div className="font-semibold">
+            <div
+              className={cn(
+                "font-semibold",
+                !isActive && "text-muted-foreground",
+              )}
+            >
               {assignment.name ?? "Untitled Assignment"}
             </div>
             {/* {!assignment.read && (
