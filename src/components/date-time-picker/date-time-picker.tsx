@@ -2,8 +2,8 @@
 
 import * as React from "react";
 
-import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -84,9 +84,9 @@ export function DateTimePicker({
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {date ? (
-            format(date, "MM/dd/yyyy hh:mm aa")
+            format(date, "dd/MM/yyyy hh:mm aa")
           ) : (
-            <span>MM/DD/YYYY hh:mm aa</span>
+            <span>dd/mm/yyyy hh:mm aa</span>
           )}
         </Button>
       </PopoverTrigger>
