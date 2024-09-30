@@ -107,7 +107,7 @@ export function DataTableFilterCheckobox<TData>({
                 ) : (
                   <span className="truncate font-normal">{option.label}</span>
                 )}
-                <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+                <span className="ml-auto flex h-4 w-4 items-center justify-center text-xs">
                   {facetedValue?.get(option.value)}
                 </span>
                 <button

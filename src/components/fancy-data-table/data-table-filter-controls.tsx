@@ -84,7 +84,7 @@ export function DataTableFilterControls<TData, TValue>({
             <AccordionItem
               key={field.value as string}
               value={field.value as string}
-              // className="border-none"
+              className="border-none"
             >
               <AccordionTrigger className="p-2 hover:no-underline">
                 <div className="flex items-center gap-2">
