@@ -34,8 +34,11 @@ export function DatePickerWithRange({
   date,
   setDate,
 }: DatePickerWithRangeProps) {
+  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      if (!isPopoverOpen) return;
       presets.map((preset) => {
         if (preset.shortcut === e.key) {
           setDate({ from: preset.from, to: preset.to });
@@ -44,11 +47,11 @@ export function DatePickerWithRange({
     };
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [setDate]);
+  }, [isPopoverOpen, setDate]);
 
   return (
     <div className={cn("grid gap-2", className)}>
-      <Popover>
+      <Popover onOpenChange={(open) => setIsPopoverOpen(open)}>
         <PopoverTrigger asChild>
           <Button
             id="date"
@@ -75,9 +78,10 @@ export function DatePickerWithRange({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div className="flex justify-between">
+          {/* <div className="flex justify-between"> */}
+          <div className="grid grid-cols-2">
             <DatePresets onSelect={setDate} selected={date} />
-            <Separator orientation="vertical" className="h-auto w-[px]" />
+            {/* <Separator orientation="vertical" className="h-auto w-[px]" /> */}
             <Calendar
               initialFocus
               mode="range"
@@ -143,7 +147,7 @@ function DatePresets({
   onSelect: (date: DateRange | undefined) => void;
 }) {
   return (
-    <div className="flex flex-col gap-2 p-3">
+    <div className="flex grow flex-col gap-2 p-3">
       <p className="mx-3 text-xs uppercase text-muted-foreground">Date Range</p>
       <div className="grid gap-1">
         {presets.map(({ label, shortcut, from, to }) => {
@@ -181,19 +185,24 @@ function CustomDateRange({
     selected?.from,
   );
   const [dateTo, setDateTo] = React.useState<Date | undefined>(selected?.to);
-  const debounceDateFrom = useDebounce(dateFrom, 1000);
-  const debounceDateTo = useDebounce(dateTo, 1000);
+  const debounceDateFrom = useDebounce(dateFrom, 500);
+  const debounceDateTo = useDebounce(dateTo, 500);
 
-  const formatDateForInput = (date: Date | undefined): string => {
-    if (!date) return "";
-    const utcDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-    return utcDate.toISOString().slice(0, 16);
-  };
+  // const formatDateForInput = (date: Date | undefined): string => {
+  //   if (!date) return "";
+  //   const utcDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  //   return utcDate.toISOString().slice(0, 16);
+  // };
 
   React.useEffect(() => {
     onSelect({ from: debounceDateFrom, to: debounceDateTo });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounceDateFrom, debounceDateTo]);
+
+  React.useEffect(() => {
+    setDateFrom(selected?.from);
+    setDateTo(selected?.to);
+  }, [selected]);
 
   return (
     <div className="flex flex-col gap-2 p-3">
