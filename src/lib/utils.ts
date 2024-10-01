@@ -23,3 +23,7 @@ export type OptimisticAction<T> = {
 export function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+export function stringToNumber(str: string): number {
+  return str.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+}
