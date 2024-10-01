@@ -6,8 +6,13 @@ import {
 } from "@/server/api/crud/course-enrolments/queries";
 import { getCourseRoles } from "@/server/api/crud/roles/queries";
 import { verifyProtectedPermission } from "@/server/auth";
+import { api } from "@/trpc/server";
+import { Edit, Plus, Trash2 } from "lucide-react";
 
 import { PERM_COURSE_MANAGE_ENROLMENTS } from "@/lib/constants";
+import { useDataTable } from "@/hooks/use-fancy-data-table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { DataTableSkeleton } from "@/components/data-table/skeleton";
 
@@ -29,12 +34,15 @@ export default async function CoursePage({ params }: CoursePageProps) {
 
   const { roles } = await getCourseRoles(params.course_id);
 
+  const { tutorials } = await api.tutorial.getAllByCourseId({
+    courseId: params.course_id,
+  });
+
   const { access: hasManageEnrolmentsPermission } =
     await verifyProtectedPermission(
       params.course_id,
       PERM_COURSE_MANAGE_ENROLMENTS,
     );
-
   return (
     <>
       <div className="space-y-2">
@@ -58,13 +66,16 @@ export default async function CoursePage({ params }: CoursePageProps) {
           />
         }
       >
+        {/*         
         <CourseParticipantsTable
           members={participants}
           candidates={enrollable}
+          tutorials={tutorials}
           hasRowActionPermission={hasManageEnrolmentsPermission}
           hasToolbarActionPermission={hasManageEnrolmentsPermission}
           roles={roles}
-        />
+        /> */}
+        <CourseParticipantsTable participants={participants} />
       </Suspense>
     </>
   );
