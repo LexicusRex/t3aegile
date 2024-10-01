@@ -38,7 +38,7 @@ export function deserialize<T extends z.AnyZodObject>(schema: T) {
 //       .safeParse(value);
 // }
 
-export function serializeColumFilters<TData>(
+export function serializeColumnFilters<TData>(
   columnFilters: ColumnFiltersState,
   filterFields?: DataTableFilterField<TData>[],
 ) {

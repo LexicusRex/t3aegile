@@ -24,7 +24,7 @@ import { Kbd } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
 
 import type { DataTableFilterField } from "../types";
-import { deserialize, serializeColumFilters } from "../utils";
+import { deserialize, serializeColumnFilters } from "../utils";
 import {
   getFieldOptions,
   getFieldValueByType,
@@ -55,7 +55,7 @@ export function DataTableFilterCommand<TData, TSchema extends z.AnyZodObject>({
     [_filterFields],
   );
   const [inputValue, setInputValue] = useState<string>(
-    serializeColumFilters(columnFilters, filterFields),
+    serializeColumnFilters(columnFilters, filterFields),
   );
   // const updateSearchParams = useUpdateSearchParams();
   // const router = useRouter();
@@ -126,7 +126,7 @@ export function DataTableFilterCommand<TData, TSchema extends z.AnyZodObject>({
   useEffect(() => {
     // REMINDER: only update the input value if the command is closed (avoids jumps while open)
     if (!open) {
-      setInputValue(serializeColumFilters(columnFilters, filterFields));
+      setInputValue(serializeColumnFilters(columnFilters, filterFields));
     }
   }, [columnFilters, filterFields, open]);
 

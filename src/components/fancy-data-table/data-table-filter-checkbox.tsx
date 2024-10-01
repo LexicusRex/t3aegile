@@ -21,7 +21,7 @@ type DataTableFilterCheckboxProps<TData> =
     table: Table<TData>;
   };
 
-export function DataTableFilterCheckobox<TData>({
+export function DataTableFilterCheckbox<TData>({
   table,
   value: _value,
   options,
@@ -77,7 +77,7 @@ export function DataTableFilterCheckobox<TData>({
             <div
               key={String(option.value)}
               className={cn(
-                "group relative flex items-center space-x-2 px-2 py-2.5 hover:bg-accent",
+                "group relative flex items-center space-x-2 px-2 hover:bg-accent",
                 index !== filterOptions.length - 1 ? "border-b" : undefined,
               )}
             >
@@ -100,7 +100,7 @@ export function DataTableFilterCheckobox<TData>({
               />
               <Label
                 htmlFor={`${value}-${option.value}`}
-                className="flex w-full items-center justify-center gap-1 truncate leading-normal text-muted-foreground group-hover:text-accent-foreground"
+                className="flex w-full cursor-pointer items-center justify-center gap-1 truncate py-2.5 leading-normal text-muted-foreground group-hover:text-accent-foreground"
               >
                 {Component ? (
                   <Component {...option} />

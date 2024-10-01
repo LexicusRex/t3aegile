@@ -15,8 +15,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
-import { DataTableFilterCheckobox } from "./data-table-filter-checkbox";
+import { DataTableFilterCheckbox } from "./data-table-filter-checkbox";
 import { DataTableFilterInput } from "./data-table-filter-input";
 import { DataTableFilterResetButton } from "./data-table-filter-reset-button";
 import { DataTableFilterSlider } from "./data-table-filter-slider";
@@ -46,14 +47,21 @@ export function DataTableFilterControls<TData, TValue>({
   // };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex h-[46px] items-center justify-between gap-3">
-        <p className="font-medium text-foreground">Filters</p>
+    <div className="flex flex-col gap-2 rounded-md border bg-card p-5 pt-3">
+      <div className="relative flex h-fit items-center justify-between gap-3">
         <div>
+          <p className="mb-1 font-medium text-foreground">Filters</p>
+          <p className="text-xs text-muted-foreground">
+            Permform row actions on selected rows.
+          </p>
+          <Separator className="my-4" />
+        </div>
+        <div className="absolute right-0 top-0">
           {filters.length ? (
             <Button
               variant="ghost"
-              size="sm"
+              size="xs"
+              className="h-7 p-2 text-xs"
               onClick={() => {
                 table.resetColumnFilters();
                 // const resetValues = filters.reduce<Record<string, null>>(
@@ -66,7 +74,7 @@ export function DataTableFilterControls<TData, TValue>({
                 // updatePageSearchParams(resetValues);
               }}
             >
-              <X className="mr-2 h-4 w-4" />
+              <X className="mr-[2px] h-3 w-3" />
               Reset
             </Button>
           ) : null}
@@ -94,12 +102,12 @@ export function DataTableFilterControls<TData, TValue>({
                   <DataTableFilterResetButton table={table} {...field} />
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="-mx-2 mb-2 mt-0 p-3">
+              <AccordionContent className="-mx-2 mt-0 px-3 pt-3">
                 {(() => {
                   switch (field.type) {
                     case "checkbox": {
                       return (
-                        <DataTableFilterCheckobox table={table} {...field} />
+                        <DataTableFilterCheckbox table={table} {...field} />
                       );
                     }
                     case "slider": {
