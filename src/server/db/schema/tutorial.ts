@@ -71,12 +71,9 @@ export const insertTutorialSchema = createInsertSchema(tutorials).omit({
 export const insertTutorialParams = baseSchema
   .extend({
     courseId: z.string().length(ID_LENGTH, { message: "Invalid course ID." }),
-    name: z
-      .string()
-      .min(1, { message: "Tutorial name is required." })
-      .max(255, {
-        message: "Tutorial name must not exceed 255 characters.",
-      }),
+    name: z.string().min(1, { message: "Tutorial name is required." }).max(10, {
+      message: "Tutorial name must not exceed 10 characters.",
+    }),
     location: z.string().optional(),
     dayOfWeek: z.number().min(0).max(6),
     startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/),
@@ -89,8 +86,8 @@ export const insertTutorialParams = baseSchema
 // Schema for updating an existing tutorial
 export const updateTutorialSchema = baseSchema;
 export const updateTutorialParams = baseSchema.extend({
-  name: z.string().min(1, { message: "Tutorial name is required." }).max(255, {
-    message: "Tutorial name must not exceed 255 characters.",
+  name: z.string().min(1, { message: "Tutorial name is required." }).max(10, {
+    message: "Tutorial name must not exceed 10 characters.",
   }),
   location: z.string().optional(),
   dayOfWeek: z.number().min(0).max(6),
@@ -105,12 +102,21 @@ export const tutorialIdSchema = baseSchema.pick({ id: true }).extend({
   }),
 });
 
+export const tutorialCoreSchema = baseSchema
+  .pick({ id: true, name: true })
+  .extend({
+    id: z.string().regex(new RegExp(`^tut_[a-zA-Z0-9]{${ID_LENGTH - 4}}$`), {
+      message: "Invalid tutorial ID format.",
+    }),
+  });
+
 // Types for tutorials - used to type API request params and within Components
 export type Tutorial = typeof tutorials.$inferSelect;
 export type NewTutorial = z.infer<typeof insertTutorialSchema>;
 export type NewTutorialParams = z.infer<typeof insertTutorialParams>;
 export type UpdateTutorialParams = z.infer<typeof updateTutorialParams>;
 export type TutorialId = z.infer<typeof tutorialIdSchema>["id"];
+export type TutorialCore = z.infer<typeof tutorialCoreSchema>;
 
 // // This type infers the return from getTutorials() - meaning it will include any joins
 // export type CompleteTutorial = Awaited<

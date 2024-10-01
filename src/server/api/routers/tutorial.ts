@@ -11,6 +11,10 @@ import {
   tutorialIdSchema,
   updateTutorialParams,
 } from "@/server/db/schema/tutorial";
+import {
+  insertTutorialEnrolmentSchema,
+  tutorialEnrolments,
+} from "@/server/db/schema/tutorialEnrolment";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -73,6 +77,14 @@ export const tutorialRouter = createTRPCRouter({
       // .innerJoin(courseEnrolments, eq(courseEnrolments.courseId, courses.id))
       // .where(eq(courseEnrolments.userId, userId));
       return { tutorials: rows };
+    }),
+
+  enrol: perrmissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
+    .input(insertTutorialEnrolmentSchema)
+    .mutation(async ({ ctx, input }) => {
+      await withTransaction(async (tx) => {
+        await tx.insert(tutorialEnrolments).values(input).returning();
+      });
     }),
   // create: perrmissionProtectedProcedure
   //   .input(z.object({ title: z.string().min(1) }))

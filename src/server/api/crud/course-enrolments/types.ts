@@ -9,6 +9,13 @@ export const courseEnrollableSchema = z.object({
 });
 export const courseParticipantSchema = courseEnrollableSchema.extend({
   role: z.string(),
+  // tutorials: z.array(
+  //   z.object({
+  //     id: z.string(),
+  //     name: z.string(),
+  //   }),
+  // ),
+  tutorials: z.array(z.string()),
 });
 
 export type CourseEnrollable = z.infer<typeof courseEnrollableSchema>;
