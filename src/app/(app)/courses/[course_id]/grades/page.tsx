@@ -1,13 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
-
 import { Edit, Plus, Trash2 } from "lucide-react";
 
 import { useDataTable } from "@/hooks/use-fancy-data-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -48,7 +45,6 @@ export default function Page({
     return null;
   }
   const filterFields = generateFilterFields(data);
-  console.log("🚀 ~ filterFields:", filterFields);
 
   return (
     <DataTable
