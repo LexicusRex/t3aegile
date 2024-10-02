@@ -19,10 +19,16 @@ export function MobileNav() {
   const pathname = "/" + fullPathname.split("/")[1];
 
   const menuRef = React.useRef<HTMLDivElement>(null);
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
         setShowMobileMenu(false);
       }
     };
@@ -38,6 +44,7 @@ export function MobileNav() {
         size="icon"
         variant="outline"
         className="flex h-9 w-9 items-center space-x-2 sm:hidden"
+        ref={buttonRef}
         onClick={() => setShowMobileMenu(!showMobileMenu)}
       >
         {showMobileMenu ? (
@@ -64,7 +71,7 @@ export function MobileNav() {
           )}
         >
           <div
-            className="relative z-20 grid gap-6 rounded-md bg-popover p-4 text-popover-foreground shadow-md"
+            className="relative z-20 grid gap-6 rounded-md bg-popover p-4 text-popover-foreground shadow-md dark:border"
             ref={menuRef}
           >
             <Link href="/" className="flex items-center space-x-2">
