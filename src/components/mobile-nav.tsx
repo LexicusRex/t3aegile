@@ -49,7 +49,7 @@ export function MobileNav() {
       </Button>
       <div
         className={cn(
-          "fixed inset-0 top-16 z-40 md:hidden",
+          "fixed inset-0 top-14 z-40 md:hidden",
           "transition-all duration-300 ease-in-out",
           showMobileMenu
             ? "bg-background/80 opacity-100 backdrop-blur-sm"
