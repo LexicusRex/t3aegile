@@ -1,8 +1,6 @@
 "use client";
 
-import { role } from "@/server/db/seeds";
-
-import { cn } from "@/lib/utils";
+import { cn, stringToNumber } from "@/lib/utils";
 import type {
   DataTableFilterField,
   Option,
@@ -117,6 +115,22 @@ export function generateFilterFields(
       label: "Tutorials",
       value: "tutorials",
       type: "checkbox",
+      component: (props: Option) => {
+        if (typeof props.value === "boolean") return null;
+        if (typeof props.value === "undefined") return null;
+        return (
+          <div className="flex w-full items-center justify-between gap-2">
+            <span className="truncate font-normal">{props.value}</span>
+            <span
+              className={cn(
+                "h-2 w-2 rounded-full",
+                tutColor[stringToNumber(props.value.toString()) % 10]?.dot ??
+                  "",
+              )}
+            />
+          </div>
+        );
+      },
       options: TUTORIALS.map((tutorial) => ({
         label: tutorial,
         value: tutorial,
