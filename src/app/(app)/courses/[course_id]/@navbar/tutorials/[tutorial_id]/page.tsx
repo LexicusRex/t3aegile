@@ -5,21 +5,25 @@ const links = [
     title: "Home",
     href: "",
     description: "Start here to get an overview of this tutorial.",
+    icon: "home",
   },
   {
     title: "Groups",
     href: "groups",
     description: "Access the tutorial's project groups for each assignment.",
+    icon: "group",
   },
   {
     title: "Members",
     href: "members",
     description: "View and manage tutorial members.",
+    icon: "users",
   },
   {
     title: "Settings",
     href: "settings",
     description: "Customize this tutorial.",
+    icon: "settings",
   },
 ];
 

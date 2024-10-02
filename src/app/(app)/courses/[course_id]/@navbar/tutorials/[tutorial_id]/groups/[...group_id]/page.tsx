@@ -5,26 +5,31 @@ const links = [
     title: "Home",
     href: "",
     description: "Start here to get an overview of this tutorial.",
+    icon: "home",
   },
   {
     title: "Taskboard",
     href: "taskboard",
     description: "Access the tutorial's project groups for each assignment.",
+    icon: "kanban",
   },
   {
     title: "Members",
     href: "members",
     description: "View and manage tutorial members.",
+    icon: "users",
   },
   {
     title: "Metrics",
     href: "Metrics",
     description: "View and manage tutorial members.",
+    icon: "chart",
   },
   {
     title: "Settings",
     href: "settings",
     description: "Customize this tutorial.",
+    icon: "settings",
   },
 ];
 

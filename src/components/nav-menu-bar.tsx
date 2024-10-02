@@ -4,21 +4,21 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// import { cn } from "@/lib/utils";
-// import {
-//   NavigationMenu,
-//   NavigationMenuContent,
-//   NavigationMenuItem,
-//   NavigationMenuLink,
-//   NavigationMenuList,
-//   NavigationMenuTrigger,
-// } from "@/components/ui/navigation-menu";
-// import LogoOutline from "@/components/aegile/logo-outline";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import { Icons } from "./icons";
 
 type pageLinks = {
   title: string;
   href: string;
   description: string;
+  icon: string;
 };
 
 export function NavMenuBar({
@@ -39,7 +39,7 @@ export function NavMenuBar({
   return (
     // <nav className="-mb-px hidden flex-col gap-6 px-4 text-lg font-medium sm:flex sm:flex-row sm:items-center sm:gap-5 sm:px-6 sm:text-sm lg:gap-6">
     // <nav className="sticky top-0 z-10 -mb-px hidden px-4 text-sm font-medium leading-5 backdrop-blur-3xl sm:flex sm:border-b">
-    <nav className="sticky top-0 z-10 -mb-px hidden bg-background px-4 text-sm font-medium leading-5 sm:flex sm:border-b">
+    <nav className="sticky top-0 z-20 -mb-px flex border-b bg-background px-4 text-sm font-medium leading-5">
       {/* <Link
         href={`/${route}/${page_id}`}
         key={page_id}
@@ -51,19 +51,42 @@ export function NavMenuBar({
       >
         Home
       </Link> */}
-      {links.map(({ title, href }) => (
-        <Link
-          href={`/${route}/${page_id}/${href}`}
-          key={href}
-          className={`p-3 transition-colors hover:text-foreground ${
-            path === href
-              ? "border-b-2 border-black text-foreground dark:border-white"
-              : "border-transparent text-muted-foreground"
-          }`}
-        >
-          {title}
-        </Link>
-      ))}
+      <TooltipProvider delayDuration={0}>
+        {links.map((link) => {
+          const IconComponent = Icons[link.icon as keyof typeof Icons];
+          return (
+            <Tooltip key={link.title}>
+              <TooltipTrigger>
+                <Link
+                  href={`/${route}/${page_id}/${link.href}`}
+                  className={cn(
+                    "relative flex items-center p-3 transition-colors hover:text-foreground",
+                    path === link.href
+                      ? "text-foreground"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  {IconComponent && (
+                    <IconComponent className="h-[18px] w-[18px] sm:mr-1 sm:h-4 sm:w-4" />
+                  )}
+                  <span className="hidden text-sm leading-none sm:block">
+                    {link.title}
+                  </span>
+                  <span
+                    className={cn(
+                      "absolute bottom-[-1px] left-0 h-[2px] w-full rounded-md bg-black dark:bg-white",
+                      path === link.href ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent className="z-50 sm:hidden">
+                <p>{link.title}</p>
+              </TooltipContent>
+            </Tooltip>
+          );
+        })}
+      </TooltipProvider>
     </nav>
   );
 }
