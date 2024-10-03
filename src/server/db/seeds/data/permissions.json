@@ -4,6 +4,7 @@
   { "slug": "role:manage" },
   { "slug": "tutorial:manage-core" },
   { "slug": "tutorial:manage-enrolments" },
+  { "slug": "tutorial:multi-enrol" },
   { "slug": "tutorial:view" },
   { "slug": "group:manage-core" },
   { "slug": "group:manage-enrolments" },

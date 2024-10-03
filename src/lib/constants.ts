@@ -3,6 +3,7 @@ export const PERM_COURSE_MANAGE_CORE = "course:manage-core";
 export const PERM_ROLE_MANAGE = "role:manage";
 export const PERM_TUTORIAL_MANAGE_CORE = "tutorial:manage-core";
 export const PERM_TUTORIAL_MANAGE_ENROLMENTS = "tutorial:manage-enrolments";
+export const PERM_TUTORIAL_MULTI_ENROL = "tutorial:multi-enrol";
 export const PERM_TUTORIAL_VIEW = "tutorial:view";
 export const PERM_GROUP_MANAGE_CORE = "group:manage-core";
 export const PERM_GROUP_MANAGE_ENROLMENTS = "group:manage-enrolments";
@@ -19,6 +20,7 @@ export const permissionsList = [
   PERM_ROLE_MANAGE,
   PERM_TUTORIAL_MANAGE_CORE,
   PERM_TUTORIAL_MANAGE_ENROLMENTS,
+  PERM_TUTORIAL_MULTI_ENROL,
   PERM_TUTORIAL_VIEW,
   PERM_GROUP_MANAGE_CORE,
   PERM_GROUP_MANAGE_ENROLMENTS,

@@ -44,6 +44,12 @@ const permissionsSettingsFormStructure = [
           "Manage tutorial enrolments, including adding or removing participants.",
       },
       {
+        name: "Allow Multiple Tutorial Enrolments",
+        slug: constants.PERM_TUTORIAL_MULTI_ENROL,
+        description:
+          "Allow users with this role to be enrolled in multiple tutorials.",
+      },
+      {
         name: "View Tutorials Externally",
         slug: constants.PERM_TUTORIAL_VIEW,
         description: "View tutorial information and details.",
