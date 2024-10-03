@@ -10,7 +10,7 @@
     "db:studio": "drizzle-kit studio",
     "db:migrate": "cross-env DB_MIGRATING=true tsx src/server/db/migrate.ts",
     "db:seed": "cross-env DB_SEEDING=true tsx src/server/db/seed.ts",
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "lint": "next lint",
     "start": "next start"
   },
