@@ -43,6 +43,39 @@ export const deleteTutorialAction = async (input: {
   }
 };
 
+type TutorialEnrolmentMutationInput = {
+  courseId: CourseId;
+  tutorialId: TutorialId;
+  userId: string;
+};
+
+export const bulkInsertTutorialEnrolmentAction = async (input: {
+  courseId: CourseId;
+  enrolments: TutorialEnrolmentMutationInput[];
+}) => {
+  if (input.enrolments.length === 0) return;
+  try {
+    // for (const enrolment of input.enrolments) {
+    //   await api.tutorial.enrol(enrolment);
+    // }
+    await api.tutorial.bulkEnrol(input);
+    revalidatePath(`/courses/${input.courseId}/tutorials`);
+  } catch (error) {
+    return handleErrors(error);
+  }
+};
+export const bulkDeleteTutorialEnrolmentAction = async (input: {
+  courseId: CourseId;
+  enrolments: TutorialEnrolmentMutationInput[];
+}) => {
+  if (input.enrolments.length === 0) return;
+  try {
+    await api.tutorial.bulkUnenrol(input);
+    revalidatePath(`/courses/${input.courseId}/tutorials`);
+  } catch (error) {
+    return handleErrors(error);
+  }
+};
 // export const createTutorialAction = (input: NewTutorialParams) => {
 //   const createTutorial = api.tutorial.create.useMutation({
 //     onError(error, variables, context) {

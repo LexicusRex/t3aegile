@@ -1,11 +1,17 @@
+import { revalidatePath } from "next/cache";
+
 import {
   createTRPCRouter,
-  perrmissionProtectedProcedure,
+  permissionProtectedProcedure,
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
 import { checkCoursePermission } from "@/server/auth";
-import { tutorials } from "@/server/db/schema";
+import {
+  courseEnrolments,
+  rolePermissions,
+  tutorials,
+} from "@/server/db/schema";
 import {
   insertTutorialParams,
   tutorialIdSchema,
@@ -15,15 +21,25 @@ import {
   insertTutorialEnrolmentSchema,
   tutorialEnrolments,
 } from "@/server/db/schema/tutorialEnrolment";
-import { eq } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
-import { PERM_TUTORIAL_MANAGE_CORE, PERM_TUTORIAL_VIEW } from "@/lib/constants";
+import {
+  PERM_TUTORIAL_MANAGE_CORE,
+  PERM_TUTORIAL_MULTI_ENROL,
+  PERM_TUTORIAL_VIEW,
+} from "@/lib/constants";
 
 import { withTransaction } from "../crud/utils";
+import { checkCourseRolePermission } from "./utils";
+
+const bulkInsertTutorialEnrolmentSchema = z.object({
+  courseId: z.string(),
+  enrolments: z.array(insertTutorialEnrolmentSchema),
+});
 
 export const tutorialRouter = createTRPCRouter({
-  create: perrmissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
+  create: permissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
     .input(insertTutorialParams)
     .mutation(async ({ ctx, input }) => {
       await withTransaction(async (tx) => {
@@ -31,7 +47,7 @@ export const tutorialRouter = createTRPCRouter({
       });
     }),
 
-  update: perrmissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
+  update: permissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
     .input(updateTutorialParams)
     .mutation(async ({ ctx, input }) => {
       await withTransaction(async (tx) => {
@@ -39,7 +55,7 @@ export const tutorialRouter = createTRPCRouter({
       });
     }),
 
-  delete: perrmissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
+  delete: permissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await withTransaction(async (tx) => {
@@ -79,14 +95,106 @@ export const tutorialRouter = createTRPCRouter({
       return { tutorials: rows };
     }),
 
-  enrol: perrmissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
-    .input(insertTutorialEnrolmentSchema)
+  // enrol: permissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
+  //   .input(insertTutorialEnrolmentSchema)
+  //   .mutation(async ({ ctx, input }) => {
+  //     await withTransaction(async (tx) => {
+  //       const preEnrolmentTutorials = await tx
+  //         .select()
+  //         .from(tutorialEnrolments)
+  //         .where(
+  //           and(
+  //             eq(tutorialEnrolments.courseId, input.courseId),
+  //             eq(tutorialEnrolments.userId, input.userId),
+  //           ),
+  //         );
+
+  //       // check if user's course Role has permission to enrol in the tutorial
+  //       const permissionCheck = await tx
+  //         .select()
+  //         .from(courseEnrolments)
+  //         .innerJoin(
+  //           rolePermissions,
+  //           and(
+  //             eq(rolePermissions.roleId, courseEnrolments.roleId),
+  //             eq(courseEnrolments.courseId, input.courseId),
+  //             eq(courseEnrolments.userId, input.userId),
+  //           ),
+  //         )
+  //         .where(eq(rolePermissions.permission, PERM_TUTORIAL_MULTI_ENROL));
+
+  //       const hasTutorialMultiEnrolmentPermission = permissionCheck.length > 0;
+
+  //       if (
+  //         !hasTutorialMultiEnrolmentPermission &&
+  //         preEnrolmentTutorials.length > 0
+  //       ) {
+  //         throw new Error(
+  //           "Some users are not allowed multiple tutorial enrolments for this course.",
+  //         );
+  //       }
+
+  //       await tx.insert(tutorialEnrolments).values(input);
+  //     });
+  //   }),
+
+  bulkEnrol: permissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
+    .input(bulkInsertTutorialEnrolmentSchema)
     .mutation(async ({ ctx, input }) => {
+      const { courseId, enrolments } = input;
+
       await withTransaction(async (tx) => {
-        await tx.insert(tutorialEnrolments).values(input).returning();
+        for (const enrolment of enrolments) {
+          const preEnrolmentTutorials = await tx
+            .select()
+            .from(tutorialEnrolments)
+            .where(
+              and(
+                eq(tutorialEnrolments.courseId, enrolment.courseId),
+                eq(tutorialEnrolments.userId, enrolment.userId),
+              ),
+            );
+
+          const hasTutorialMultiEnrolmentPermission =
+            await checkCourseRolePermission(
+              tx,
+              enrolment.courseId,
+              enrolment.userId,
+              PERM_TUTORIAL_MULTI_ENROL,
+            );
+          if (
+            !hasTutorialMultiEnrolmentPermission &&
+            preEnrolmentTutorials.length > 0
+          ) {
+            throw new Error(
+              "Some users are not allowed multiple tutorial enrolments for this course.",
+            );
+          }
+
+          await tx.insert(tutorialEnrolments).values(enrolment);
+        }
       });
     }),
-  // create: perrmissionProtectedProcedure
+
+  bulkUnenrol: permissionProtectedProcedure(PERM_TUTORIAL_MANAGE_CORE)
+    .input(bulkInsertTutorialEnrolmentSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { courseId, enrolments } = input;
+      for (const enrolment of enrolments) {
+        await withTransaction(async (tx) => {
+          await tx
+            .delete(tutorialEnrolments)
+            .where(
+              and(
+                eq(tutorialEnrolments.courseId, courseId),
+                eq(tutorialEnrolments.userId, enrolment.userId),
+                eq(tutorialEnrolments.tutorialId, enrolment.tutorialId),
+              ),
+            );
+        });
+      }
+    }),
+  // create: permissionProtectedProcedure
   //   .input(z.object({ title: z.string().min(1) }))
   //   .mutation(async ({ ctx, input }) => {
   //     await ctx.db.insert(tutorials).values({
