@@ -28,6 +28,7 @@ export const defaultRoles = [
       constants.PERM_TUTORIAL_VIEW,
       constants.PERM_TUTORIAL_MANAGE_ENROLMENTS,
       constants.PERM_TUTORIAL_MANAGE_CORE,
+      constants.PERM_TUTORIAL_MULTI_ENROL,
     ],
   },
   {
@@ -36,6 +37,7 @@ export const defaultRoles = [
     permissions: [
       constants.PERM_TUTORIAL_MANAGE_ENROLMENTS,
       constants.PERM_TUTORIAL_MANAGE_CORE,
+      constants.PERM_TUTORIAL_MULTI_ENROL,
     ],
   },
   { name: "Student", isDefault: true, permissions: [] },
