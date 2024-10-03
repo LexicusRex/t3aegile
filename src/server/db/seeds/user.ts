@@ -6,7 +6,7 @@ import { users } from "../schema";
 // import usersData from "./data/courses.json";
 
 export default async function seed(db: db) {
-  const fakerUsers = Array.from({ length: 20 }, () => ({
+  const fakerUsers = Array.from({ length: 50 }, () => ({
     name: faker.person.fullName(),
     email: faker.internet.email(),
   }));
