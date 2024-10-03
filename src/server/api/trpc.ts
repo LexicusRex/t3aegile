@@ -133,7 +133,7 @@ export const protectedProcedure = t.procedure
     });
   });
 
-export const perrmissionProtectedProcedure = (permissionSlug: PermissionSlug) =>
+export const permissionProtectedProcedure = (permissionSlug: PermissionSlug) =>
   t.procedure
     .use(timingMiddleware)
     .input(z.object({ courseId: z.string() }).passthrough())
