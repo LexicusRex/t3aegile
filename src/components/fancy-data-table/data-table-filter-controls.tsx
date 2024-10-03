@@ -103,6 +103,12 @@ export function DataTableFilterControls<TData, TValue>({
                 </div>
               </AccordionTrigger>
               <AccordionContent className="-mx-2 mt-0 px-3 pt-3">
+                {/* if field.options is empty */}
+                {field.options?.length === 0 && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    No options available...
+                  </p>
+                )}
                 {(() => {
                   switch (field.type) {
                     case "checkbox": {
