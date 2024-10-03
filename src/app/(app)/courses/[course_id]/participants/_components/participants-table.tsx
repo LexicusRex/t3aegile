@@ -90,7 +90,7 @@ import type {
 } from "@/server/api/crud/course-enrolments/types";
 import type { Role } from "@/server/db/schema/role";
 import type { TutorialCore } from "@/server/db/schema/tutorial";
-import { Edit, Plus, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 import { useDataTable } from "@/hooks/use-fancy-data-table";
 import { Button } from "@/components/ui/button";
@@ -110,24 +110,29 @@ export default function CourseParticipantsTable({
   enrollables,
   tutorials,
   roles,
+  canManageCourseEnrolments,
+  canManageTutorialEnrolments,
 }: {
   courseId: string;
   participants: CourseParticipant[];
   enrollables: CourseEnrollable[];
   tutorials: TutorialCore[];
   roles: Role[];
+  canManageCourseEnrolments?: boolean;
+  canManageTutorialEnrolments?: boolean;
 }) {
   const columns = React.useMemo(() => {
-    return [
-      ...baseColumns,
-      {
-        id: "actions",
-        cell: ({ row }) => (
-          <DataTableRowActions row={row} roles={roles} courseId={courseId} />
-        ),
-      },
-    ];
-  }, [roles, courseId]);
+    const baseCols = [...baseColumns];
+    if (!canManageCourseEnrolments) return baseCols;
+
+    baseCols.push({
+      id: "actions",
+      cell: ({ row }) => (
+        <DataTableRowActions row={row} roles={roles} courseId={courseId} />
+      ),
+    });
+    return baseCols;
+  }, [roles, courseId, canManageCourseEnrolments]);
 
   const { table } = useDataTable({
     columns,
@@ -143,51 +148,59 @@ export default function CourseParticipantsTable({
       columnFilterSchema={columnFilterSchema}
       filterFields={filterFields}
     >
-      <div className="h-fit w-full rounded-md border bg-card p-5 pt-3">
-        <p className="font-medium text-foreground">Actions</p>
-        <p className="text-xs text-muted-foreground">
-          Permform row actions on selected rows.
-        </p>
-        <Separator className="my-4" />
-        {table.getFilteredSelectedRowModel().rows.length === 0 && (
-          <div>
-            <h3 className="mb-2 text-sm">Enrol Course Participants</h3>
-            <EnrolParticipantsDialog
-              courseId={courseId}
-              enrollableUsers={enrollables}
-            />
-          </div>
-        )}
-
-        {table.getFilteredSelectedRowModel().rows.length > 0 && (
-          <div>
-            {/* Delete Section */}
+      {canManageCourseEnrolments && (
+        <div className="h-fit w-full rounded-md border bg-card p-5 pt-3">
+          <p className="font-medium text-foreground">Actions</p>
+          <p className="text-xs text-muted-foreground">
+            Permform row actions on selected rows.
+          </p>
+          <Separator className="my-4" />
+          {table.getFilteredSelectedRowModel().rows.length === 0 && (
             <div>
-              <h3 className="mb-2 text-sm">Delete Selected Rows</h3>
-              <Button
-                variant="destructive"
-                className="h-8 w-full border-red-500/20 bg-red-500/10 text-xs hover:bg-red-500/20 [&>*]:text-red-600 dark:[&>*]:text-red-400"
-              >
-                <Trash2 className="mr-1 h-3 w-3" />
-                <p>
-                  Delete {table.getFilteredSelectedRowModel().rows.length}{" "}
-                  row(s)
-                </p>
-              </Button>
-            </div>
-
-            <Separator className="my-4" />
-            <div>
-              <h3 className="mb-2 text-sm">Manage Tutorial Enrolment(s)</h3>
-              <TutorialMultiSelect
+              <h3 className="mb-2 text-sm">Enrol Course Participants</h3>
+              <EnrolParticipantsDialog
                 courseId={courseId}
-                selectedRows={table.getFilteredSelectedRowModel().rows}
-                allTutorials={tutorials}
+                enrollableUsers={enrollables}
               />
             </div>
-          </div>
-        )}
-      </div>
+          )}
+
+          {table.getFilteredSelectedRowModel().rows.length > 0 && (
+            <div>
+              {/* Delete Section */}
+              <div>
+                <h3 className="mb-2 text-sm">Delete Selected Rows</h3>
+                <Button
+                  variant="destructive"
+                  className="h-8 w-full border-red-500/20 bg-red-500/10 text-xs hover:bg-red-500/20 [&>*]:text-red-600 dark:[&>*]:text-red-400"
+                >
+                  <Trash2 className="mr-1 h-3 w-3" />
+                  <p>
+                    Delete {table.getFilteredSelectedRowModel().rows.length}{" "}
+                    row(s)
+                  </p>
+                </Button>
+              </div>
+
+              {canManageTutorialEnrolments && (
+                <>
+                  <Separator className="my-4" />
+                  <div>
+                    <h3 className="mb-2 text-sm">
+                      Manage Tutorial Enrolment(s)
+                    </h3>
+                    <TutorialMultiSelect
+                      courseId={courseId}
+                      selectedRows={table.getFilteredSelectedRowModel().rows}
+                      allTutorials={tutorials}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </DataTable>
   );
 }

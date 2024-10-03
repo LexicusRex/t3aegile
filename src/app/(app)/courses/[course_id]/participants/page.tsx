@@ -8,7 +8,10 @@ import { getCourseRoles } from "@/server/api/crud/roles/queries";
 import { verifyProtectedPermission } from "@/server/auth";
 import { api } from "@/trpc/server";
 
-import { PERM_COURSE_MANAGE_ENROLMENTS } from "@/lib/constants";
+import {
+  PERM_COURSE_MANAGE_ENROLMENTS,
+  PERM_TUTORIAL_MANAGE_ENROLMENTS,
+} from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import { DataTableSkeleton } from "@/components/data-table/skeleton";
 
@@ -34,11 +37,18 @@ export default async function CoursePage({ params }: CoursePageProps) {
     courseId: params.course_id,
   });
 
-  const { access: hasManageEnrolmentsPermission } =
+  const { access: hasManageCourseEnrolmentsPermission } =
     await verifyProtectedPermission(
       params.course_id,
       PERM_COURSE_MANAGE_ENROLMENTS,
     );
+
+  const { access: hasManageTutorialEnrolmentsPermission } =
+    await verifyProtectedPermission(
+      params.course_id,
+      PERM_TUTORIAL_MANAGE_ENROLMENTS,
+    );
+
   return (
     <>
       <div className="space-y-2">
@@ -77,6 +87,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
           enrollables={enrollable}
           tutorials={tutorials}
           roles={roles}
+          canManageCourseEnrolments={hasManageCourseEnrolmentsPermission}
+          canManageTutorialEnrolments={hasManageTutorialEnrolmentsPermission}
         />
       </Suspense>
     </>
