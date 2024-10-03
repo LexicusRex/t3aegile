@@ -158,17 +158,11 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { format, isSameDay } from "date-fns";
-import { Check, Minus } from "lucide-react";
 
 import { stringToNumber } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/fancy-data-table/data-table-column-header";
-import {
-  isArrayOfDates,
-  isArrayOfNumbers,
-} from "@/components/fancy-data-table/utils";
 
 import { tutColor } from "./constants";
 import type { ColumnSchema } from "./schema";
@@ -198,6 +192,12 @@ export const columns: ColumnDef<ColumnSchema>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+  // {
+  //   accessorKey: "id",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="User ID" />
+  //   ),
+  // },
   {
     accessorKey: "name",
     header: ({ column }) => (

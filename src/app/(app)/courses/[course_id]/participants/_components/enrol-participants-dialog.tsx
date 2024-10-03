@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { createCourseEnrolmentAction } from "@/server/actions/courseEnrolments";
 import type { CourseEnrollable } from "@/server/api/crud/course-enrolments/types";
-import { Users } from "lucide-react";
+import { PlusIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -58,8 +58,8 @@ export function EnrolParticipantsDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default" size="sm">
-          <Users className="mr-2 h-4 w-4" />
+        <Button variant="default" size="xs" className="mt-2 w-full text-xs">
+          <PlusIcon className="mr-2 h-4 w-4" />
           Enrol Participants
         </Button>
       </DialogTrigger>

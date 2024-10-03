@@ -3,9 +3,10 @@ import { z } from "zod";
 import { ARRAY_DELIMITER } from "@/components/fancy-data-table/schema";
 
 export const columnSchema = z.object({
-  name: z.string().optional().nullable(),
+  id: z.string(),
+  name: z.string().nullable(),
   email: z.string(),
-  image: z.string().optional().nullable(),
+  image: z.string().nullable(),
   role: z.string(),
   tutorials: z.string().array(),
   // date: z.date(),

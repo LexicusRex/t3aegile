@@ -82,7 +82,14 @@
 
 "use client";
 
-import type { CourseParticipant } from "@/server/api/crud/course-enrolments/types";
+import * as React from "react";
+
+import type {
+  CourseEnrollable,
+  CourseParticipant,
+} from "@/server/api/crud/course-enrolments/types";
+import type { Role } from "@/server/db/schema/role";
+import type { TutorialCore } from "@/server/db/schema/tutorial";
 import { Edit, Plus, Trash2 } from "lucide-react";
 
 import { useDataTable } from "@/hooks/use-fancy-data-table";
@@ -90,15 +97,38 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { DataTable } from "@/components/fancy-data-table/data-table";
 
-import { columns } from "./columns";
+import { columns as baseColumns } from "./columns";
 import { generateFilterFields } from "./constants";
+import { EnrolParticipantsDialog } from "./enrol-participants-dialog";
+import { DataTableRowActions } from "./participants-table-row-actions";
 import { generateFilterSchema } from "./schema";
+import { TutorialMultiSelect } from "./tutorial-enrolment-multiselect";
 
 export default function CourseParticipantsTable({
+  courseId,
   participants,
+  enrollables,
+  tutorials,
+  roles,
 }: {
+  courseId: string;
   participants: CourseParticipant[];
+  enrollables: CourseEnrollable[];
+  tutorials: TutorialCore[];
+  roles: Role[];
 }) {
+  const columns = React.useMemo(() => {
+    return [
+      ...baseColumns,
+      {
+        id: "actions",
+        cell: ({ row }) => (
+          <DataTableRowActions row={row} roles={roles} courseId={courseId} />
+        ),
+      },
+    ];
+  }, [roles, courseId]);
+
   const { table } = useDataTable({
     columns,
     data: participants,
@@ -121,11 +151,11 @@ export default function CourseParticipantsTable({
         <Separator className="my-4" />
         {table.getFilteredSelectedRowModel().rows.length === 0 && (
           <div>
-            <h3 className="mb-2 text-sm">Add New Row</h3>
-            <Button className="mt-2 h-8 w-full text-xs">
-              <Plus className="mr-1 h-3 w-3" />
-              Add New Row
-            </Button>
+            <h3 className="mb-2 text-sm">Enrol Course Participants</h3>
+            <EnrolParticipantsDialog
+              courseId={courseId}
+              enrollableUsers={enrollables}
+            />
           </div>
         )}
 
@@ -147,6 +177,14 @@ export default function CourseParticipantsTable({
             </div>
 
             <Separator className="my-4" />
+            <div>
+              <h3 className="mb-2 text-sm">Manage Tutorial Enrolment(s)</h3>
+              <TutorialMultiSelect
+                courseId={courseId}
+                selectedRows={table.getFilteredSelectedRowModel().rows}
+                allTutorials={tutorials}
+              />
+            </div>
           </div>
         )}
       </div>
