@@ -47,7 +47,12 @@ export const updateCourseEnrolment = async (
     await tx
       .update(courseEnrolments)
       .set({ ...updatedEnrolment, updatedAt: new Date() })
-      .where(eq(courseEnrolments.courseId, updatedEnrolment.courseId));
+      .where(
+        and(
+          eq(courseEnrolments.courseId, updatedEnrolment.courseId),
+          eq(courseEnrolments.userId, updatedEnrolment.userId),
+        ),
+      );
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);

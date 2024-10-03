@@ -67,9 +67,10 @@ export const updateRoleParams = baseRoleSchema.extend({
 });
 // .omit({ courseId: true });
 export const roleIdSchema = baseRoleSchema.pick({ id: true });
+export const roleSchema = baseRoleSchema.pick({ id: true, name: true });
 
 // Types for roles - used to type API request params and within Components
-export type Role = typeof roles.$inferSelect;
+export type Role = z.infer<typeof roleSchema>;
 export type NewRole = z.infer<typeof insertRoleSchema>;
 export type NewRoleParams = z.infer<typeof insertRoleParams>;
 export type UpdateRoleParams = z.infer<typeof updateRoleParams>;

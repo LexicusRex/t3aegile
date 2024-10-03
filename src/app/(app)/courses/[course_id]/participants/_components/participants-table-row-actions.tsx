@@ -3,11 +3,15 @@
 import React, { useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import { deleteCourseEnrolmentAction } from "@/server/actions/courseEnrolments";
+import {
+  deleteCourseEnrolmentAction,
+  updateCourseEnrolmentAction,
+} from "@/server/actions/courseEnrolments";
 // import AlertDeleteDialog from "@/components/alert-delete-dialog";
 
 // import { roles } from "./data";
 import type { CourseParticipant } from "@/server/api/crud/course-enrolments/types";
+import type { Role } from "@/server/db/schema/role";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import type { Row } from "@tanstack/react-table";
 import { toast } from "sonner";
@@ -29,7 +33,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuRadioGroup,
-  // DropdownMenuRadioItem,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   // DropdownMenuShortcut,
   DropdownMenuSub,
@@ -38,14 +42,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// import { taskSchema } from '../data/schema';
-
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
+  roles: Role[];
+  courseId: string;
 }
 
 export function DataTableRowActions<TData>({
   row,
+  roles,
+  courseId,
 }: DataTableRowActionsProps<TData>) {
   const router = useRouter();
 
@@ -55,25 +61,22 @@ export function DataTableRowActions<TData>({
 
   const [pending, startMutation] = useTransition();
 
-  // async function switchRole(role: string) {
-  // await clientFetch(
-  //   `/api/courses/${course_id}/enrolments/${user.id}`,
-  //   "PUT",
-  //   { role },
-  // )
-  //   .then((data) => {
-  //     toast.success("Member role changed successfully!");
-  //     router.refresh();
-  //   })
-  //   .catch((error) => toast.error(error.message));
-  // }
+  async function switchRole(roleId: string) {
+    const error = await updateCourseEnrolmentAction({
+      userId: user.id,
+      courseId,
+      roleId,
+    });
+
+    error
+      ? toast.error(`Failed to switch roles`, {
+          description: error ?? "Error",
+        })
+      : toast.success(`Roles switched successfully!`);
+  }
 
   async function deleteEnrolment(userId: string, courseId: string) {
     startMutation(async () => {
-      console.log("🚀 ~ startMutation ~ { courseId, userId }:", {
-        courseId,
-        userId,
-      });
       const error = await deleteCourseEnrolmentAction({ courseId, userId });
       const failed = Boolean(error);
       if (failed) {
@@ -100,22 +103,22 @@ export function DataTableRowActions<TData>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Roles</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <DropdownMenuRadioGroup value={user.role || undefined}>
-                {/* {roles.map((role) => (
+                {roles.map((role) => (
                   <DropdownMenuRadioItem
-                    key={role.value}
-                    value={role.value ? role.value : ""}
+                    key={role.id}
+                    value={role.name ? role.name : ""}
                     className="justify-start"
-                    onSelect={() => switchRole(role.value)}
+                    onSelect={async () =>
+                      user.role !== role.name && (await switchRole(role.id))
+                    }
                   >
-                    {role.label}
+                    {role.name}
                   </DropdownMenuRadioItem>
-                ))} */}
+                ))}
               </DropdownMenuRadioGroup>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
@@ -130,7 +133,6 @@ export function DataTableRowActions<TData>({
       </DropdownMenu>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        {/* <AlertDialogTrigger>Kick</AlertDialogTrigger> */}
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

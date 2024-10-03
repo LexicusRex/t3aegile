@@ -38,7 +38,7 @@ export const updateCourseEnrolmentAction = permissionProtectedAction(
     const payload = updateCourseEnrolmentParams.parse(input);
     await withTransaction(async (tx) => {
       await updateCourseEnrolment(payload, tx);
-      // revalidateCourses();
+      revalidatePath(`/courses/${payload.courseId}/participants`);
     });
   },
   (input) => input.courseId,
