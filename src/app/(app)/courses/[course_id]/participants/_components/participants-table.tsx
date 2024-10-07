@@ -186,9 +186,11 @@ export default function CourseParticipantsTable({
                 <>
                   <Separator className="my-4" />
                   <div>
-                    <h3 className="mb-2 text-sm">
-                      Manage Tutorial Enrolment(s)
-                    </h3>
+                    <h3 className="text-sm">Manage Tutorial Enrolment(s)</h3>
+                    <p className="my-2 text-xs text-muted-foreground">
+                      Shows <strong>common</strong> tutorials of selected rows.
+                      Changes apply to all selected rows.
+                    </p>
                     <TutorialMultiSelect
                       courseId={courseId}
                       selectedRows={table.getFilteredSelectedRowModel().rows}
