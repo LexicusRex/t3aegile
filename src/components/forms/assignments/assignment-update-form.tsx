@@ -9,35 +9,35 @@ import {
   type Assignment,
 } from "@/server/db/schema/assignment";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PencilIcon } from "lucide-react";
+// import { PencilIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { DateTimeFormPicker } from "@/components/date-time-picker/form/date-time-picker";
 import { FloatingAlert } from "@/components/forms/floating-alert";
 
 interface AssignmentUpdateFormProps {
   assignment: Assignment;
-  editing: boolean;
+  // editing: boolean;
 }
 
 type AssignmentUpdateFormValues = z.infer<typeof updateAssignmentParams>;
 
 export default function AssignmentUpdateForm({
   assignment,
-  editing,
+  // editing,
 }: AssignmentUpdateFormProps) {
   const [pending, startMutation] = useTransition();
   const router = useRouter();
@@ -76,83 +76,184 @@ export default function AssignmentUpdateForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
           }
         }}
       >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              {/* {<FormLabel>Role Name</FormLabel>} */}
-              <FormControl>
-                <div className="group flex items-center space-x-2">
+        <div className="grid w-full grid-cols-[auto_1fr] gap-x-6">
+          <div className="flex min-h-8 items-start py-2 text-xs font-medium text-muted-foreground">
+            Name
+          </div>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl className="flex min-h-8 items-start rounded-md p-2 text-xs font-light transition-colors duration-300 hover:bg-accent">
                   <Input
                     type="text"
                     {...field}
                     placeholder="Assignment Title"
-                    className="border-0 border-border px-0 text-2xl font-medium shadow-none placeholder:text-gray-300 focus-visible:ring-0"
+                    className="flex h-8 border-none text-xs font-light shadow-none focus-visible:ring-0"
                   />
-                  <PencilIcon className="h-5 w-5 text-gray-400 opacity-30 transition-opacity duration-200 ease-in-out group-hover:opacity-100" />
-                </div>
-              </FormControl>
-              <FormDescription>Click to edit</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="availableAt"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel className="text-left">Available At</FormLabel>
-              <DateTimeFormPicker field={field} />
-              {/* <Popover>
-                <FormControl>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "h-9 w-[280px] justify-start text-left font-normal",
-                        !field.value && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {field.value ? (
-                        format(field.value, "eee, dd MMM, yyy  ->  hh:mm a")
-                      ) : (
-                        <span>Pick a date & time</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
                 </FormControl>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={field.value ?? undefined}
-                    onSelect={field.onChange}
-                    initialFocus
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex min-h-8 items-start py-2 text-xs font-medium text-muted-foreground">
+            Weighting (%)
+          </div>
+          <FormField
+            control={form.control}
+            name="weighting"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl className="flex min-h-8 items-start rounded-md p-2 text-xs font-light transition-colors duration-300 hover:bg-accent">
+                  <Input
+                    type="number"
+                    {...field}
+                    placeholder="15"
+                    className="flex h-8 border-none text-xs font-light shadow-none focus-visible:ring-0"
                   />
-                  <div className="border-t border-border p-3">
-                    <TimePickerFields
-                      setDate={field.onChange}
-                      date={field.value ?? undefined}
-                    />
-                  </div>
-                </PopoverContent>
-              </Popover> */}
-              <FormDescription>
-                The datetime at which the assignment will be active & viewable
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex min-h-8 items-start py-2 text-xs font-medium text-muted-foreground">
+            Available At
+          </div>
+          <FormField
+            control={form.control}
+            name="availableAt"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <DateTimeFormPicker
+                  field={field}
+                  className="h-8 border-none px-2 text-xs font-light"
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex min-h-8 items-start py-2 text-xs font-medium text-muted-foreground">
+            Tags
+          </div>
+          <div className="flex h-8 items-start rounded-md p-2 text-xs font-light transition-colors duration-300 hover:bg-accent">
+            Empty
+          </div>
+
+          <div className="min-h-8 items-start py-2 text-xs font-medium text-muted-foreground">
+            Groups
+          </div>
+          <FormField
+            control={form.control}
+            name="isGroup"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl className="">
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      if (!checked) {
+                        form.setValue("isSelfEnrol", false);
+                        form.setValue("isTutorialGrouping", false);
+                      }
+                      field.onChange(checked);
+                    }}
+                    className="m-2 self-start"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div
+            className={cn(
+              "min-h-8 items-start py-2 text-xs font-medium text-muted-foreground",
+              !form.getValues("isGroup") && "text-muted-foreground/50",
+            )}
+          >
+            Self-enrol
+          </div>
+          <FormField
+            control={form.control}
+            name="isSelfEnrol"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl className="">
+                  <Switch
+                    checked={form.getValues("isGroup") && field.value}
+                    onCheckedChange={field.onChange}
+                    className="m-2 self-start"
+                    disabled={!form.getValues("isGroup")}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div
+            className={cn(
+              "min-h-8 items-start py-2 text-xs font-medium text-muted-foreground",
+              !form.getValues("isGroup") && "text-muted-foreground/50",
+            )}
+          >
+            Tutorial Grouping
+          </div>
+          <FormField
+            control={form.control}
+            name="isTutorialGrouping"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl className="">
+                  <Switch
+                    checked={form.getValues("isGroup") && field.value}
+                    onCheckedChange={field.onChange}
+                    className="m-2 self-start"
+                    disabled={!form.getValues("isGroup")}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div
+            className={cn(
+              "min-h-8 items-start py-2 text-xs font-medium text-muted-foreground",
+              !form.getValues("isGroup") && "text-muted-foreground/50",
+            )}
+          >
+            Team Size
+          </div>
+          <FormField
+            control={form.control}
+            name="maxGroupSize"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl className="flex min-h-8 items-start rounded-md p-2 text-xs font-light transition-colors duration-300 hover:bg-accent">
+                  <Input
+                    type="number"
+                    {...field}
+                    placeholder="5"
+                    disabled={!form.getValues("isGroup")}
+                    className="flex h-8 border-none text-xs font-light shadow-none focus-visible:ring-0"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <FloatingAlert isDirty={form.formState.isDirty}>
           <div className="flex items-center gap-x-2">
             <Button
