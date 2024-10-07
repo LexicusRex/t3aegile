@@ -66,4 +66,27 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Hide arrows by default */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  /* Show arrows on focus */
+  input[type="number"]:focus::-webkit-outer-spin-button,
+  input[type="number"]:focus::-webkit-inner-spin-button {
+    -webkit-appearance: auto;
+  }
+
+  input[type="number"]:focus {
+    appearance: textfield;
+    -moz-appearance: auto;
+  }
 }
