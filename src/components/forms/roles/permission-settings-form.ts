@@ -92,6 +92,12 @@ const permissionsSettingsFormStructure = [
         description:
           "Manage core assignment settings, including creating or editing assignments.",
       },
+      {
+        name: "Liable to Submit Assignment Deliverables",
+        slug: constants.PERM_ASSIGNMENT_SUBMISSION_LIABLE,
+        description:
+          "Users with this role permission are deemed assessable and are liable to submit assignment deliverables.",
+      },
     ],
   },
   {

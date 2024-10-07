@@ -11,6 +11,7 @@
   { "slug": "group:manage-self-enrolment" },
   { "slug": "group:view" },
   { "slug": "assignment:manage-core" },
+  { "slug": "assignment:submission-liable" },
   { "slug": "submission:submit" },
   { "slug": "submission:view" },
   { "slug": "submission:resubmit" }

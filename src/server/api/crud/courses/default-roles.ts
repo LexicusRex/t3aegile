@@ -40,5 +40,9 @@ export const defaultRoles = [
       constants.PERM_TUTORIAL_MULTI_ENROL,
     ],
   },
-  { name: "Student", isDefault: true, permissions: [] },
+  {
+    name: "Student",
+    isDefault: true,
+    permissions: [constants.PERM_ASSIGNMENT_SUBMISSION_LIABLE],
+  },
 ];

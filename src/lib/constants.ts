@@ -10,6 +10,7 @@ export const PERM_GROUP_MANAGE_ENROLMENTS = "group:manage-enrolments";
 export const PERM_GROUP_MANAGE_SELF_ENROLMENT = "group:manage-self-enrolment";
 export const PERM_GROUP_VIEW = "group:view";
 export const PERM_ASSIGNMENT_MANAGE_CORE = "assignment:manage-core";
+export const PERM_ASSIGNMENT_SUBMISSION_LIABLE = "assignment:submission-liable";
 export const PERM_SUBMISSION_SUBMIT = "submission:submit";
 export const PERM_SUBMISSION_VIEW = "submission:view";
 export const PERM_SUBMISSION_RESUBMIT = "submission:resubmit";
@@ -27,6 +28,7 @@ export const permissionsList = [
   PERM_GROUP_MANAGE_SELF_ENROLMENT,
   PERM_GROUP_VIEW,
   PERM_ASSIGNMENT_MANAGE_CORE,
+  PERM_ASSIGNMENT_SUBMISSION_LIABLE,
   PERM_SUBMISSION_SUBMIT,
   PERM_SUBMISSION_VIEW,
   PERM_SUBMISSION_RESUBMIT,
