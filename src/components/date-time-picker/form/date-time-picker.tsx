@@ -24,10 +24,12 @@ type DateFieldProps<T extends FieldValues> = Omit<
 
 interface DateTimeFormPickerProps<T extends FieldValues> {
   field: DateFieldProps<T>;
+  className?: string;
 }
 
 export function DateTimeFormPicker<T extends FieldValues>({
   field,
+  className,
   // form
 }: DateTimeFormPickerProps<T>) {
   const handleDateSelect = (date: Date | undefined) => {
@@ -69,12 +71,13 @@ export function DateTimeFormPicker<T extends FieldValues>({
             className={cn(
               "h-9 w-full pl-3 text-left font-normal",
               !field.value && "text-muted-foreground",
+              className,
             )}
           >
             {field.value ? (
-              format(field.value, "MM/dd/yyyy hh:mm aa")
+              format(field.value, "dd MMM yyyy -> hh:mm aa")
             ) : (
-              <span>MM/DD/YYYY hh:mm aa</span>
+              <span>{"dd MMM YYYY -> hh:mm a"}</span>
             )}
             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
           </Button>
