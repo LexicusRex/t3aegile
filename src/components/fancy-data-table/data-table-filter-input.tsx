@@ -49,7 +49,7 @@ export function DataTableFilterInput<TData>({
         value={filters}
         onChange={(e) => {
           const val = e.target.value;
-          const newValue = val.trim() === "" ? null : val;
+          const newValue = val.trim() === "" ? "" : val;
           column?.setFilterValue(newValue);
           // updatePageSearchParams({
           //   [value]: newValue,
