@@ -6,4 +6,7 @@ export { rolePermissions, roleToPermissionRelations } from "./rolePermissions";
 export { courseEnrolments, courseEnrolmentRelations } from "./courseEnrolment";
 export { tutorials } from "./tutorial";
 export { tutorialEnrolments } from "./tutorialEnrolment";
+export { assignments } from "./assignment";
+export { groups } from "./group";
+export { groupEnrolments } from "./groupEnrolment";
 export { posts } from "./post";
