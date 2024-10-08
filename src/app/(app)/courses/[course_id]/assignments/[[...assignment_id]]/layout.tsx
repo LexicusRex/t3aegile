@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
 
 import { getAssignmentsByCourse } from "@/server/api/crud/assignments/queries";
@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import NewAssignmentButton from "./_components/new-assignment-button";
+import Loading from "./loading";
 
 interface AssignmentsLayoutProps {
   params: { course_id: string; assignment_id?: string[] };
@@ -49,7 +50,7 @@ export default async function AssignmentsLayout({
       </div>
       <Separator className="my-6" />
       <div className="flex grow">
-        <div className="sticky top-16 max-w-[500px] grow self-start">
+        <div className="sticky top-16 max-w-sm grow self-start">
           <Tabs defaultValue="ongoing">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger
@@ -106,7 +107,9 @@ export default async function AssignmentsLayout({
             <SelectItem value="system">System</SelectItem>
           </SelectContent>
         </Select> */}
-        <div className="grow">{children}</div>
+        <div className="grow">
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+        </div>
       </div>
     </>
   );
