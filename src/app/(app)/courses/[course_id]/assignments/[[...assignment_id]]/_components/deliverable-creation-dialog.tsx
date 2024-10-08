@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { PlusCircleIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,12 +35,12 @@ export default function DeliverableCreationDialog({
             New
           </span>
           </Button> */}
-        <div className="flex min-h-56 grow cursor-pointer flex-col items-center justify-center rounded-xl border bg-muted/30 hover:bg-muted">
-          <PlusIcon className="" />
+        <Button size="xs" className="w-full text-sm">
+          <PlusIcon className="mr-1 h-4 w-4" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            New
+            New Deliverable
           </span>
-        </div>
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
