@@ -1,3 +1,5 @@
+import { assignmentRouter } from "@/server/api/routers/assignment";
+import { groupRouter } from "@/server/api/routers/group";
 import { postRouter } from "@/server/api/routers/post";
 import { tutorialRouter } from "@/server/api/routers/tutorial";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
@@ -10,6 +12,8 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 export const appRouter = createTRPCRouter({
   post: postRouter,
   tutorial: tutorialRouter,
+  assignment: assignmentRouter,
+  group: groupRouter,
 });
 
 // export type definition of API
