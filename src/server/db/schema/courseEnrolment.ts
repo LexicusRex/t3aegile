@@ -10,7 +10,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
+import { z } from "zod";
 
 import { timestamps } from "@/lib/utils";
 
@@ -80,7 +80,11 @@ const baseSchema = createSelectSchema(courseEnrolments).omit(timestamps);
 export const insertCourseEnrolmentSchema = createInsertSchema(
   courseEnrolments,
 ).omit({ ...timestamps, roleId: true });
-export const insertCourseEnrolmentParams = insertCourseEnrolmentSchema;
+export const insertCourseEnrolmentParams = insertCourseEnrolmentSchema
+  .pick({ courseId: true })
+  .extend({
+    userIds: z.string().array(),
+  });
 
 export const updateCourseEnrolmentSchema = baseSchema;
 export const updateCourseEnrolmentParams = baseSchema;

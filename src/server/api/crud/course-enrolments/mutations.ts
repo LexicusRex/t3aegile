@@ -4,7 +4,7 @@ import "server-only";
 import { courseEnrolments, courses } from "@/server/db/schema";
 import {
   courseEnrolmentIdSchema,
-  insertCourseEnrolmentSchema,
+  insertCourseEnrolmentParams,
   updateCourseEnrolmentSchema,
   type CourseEnrolmentId,
   type NewCourseEnrolmentParams,
@@ -19,18 +19,21 @@ export const createCourseEnrolment = async (
   enrolment: NewCourseEnrolmentParams,
   tx: DrizzleTransaction,
 ) => {
-  const newEnrolment = insertCourseEnrolmentSchema.parse(enrolment);
+  const { courseId, userIds } = insertCourseEnrolmentParams.parse(enrolment);
   try {
-    const defaultRoleId = await getDefaultCourseRole(newEnrolment.courseId, tx);
+    const defaultRoleId = await getDefaultCourseRole(courseId, tx);
     if (!defaultRoleId) throw new Error("Default role not found");
 
-    await tx
-      .insert(courseEnrolments)
-      .values({ ...newEnrolment, roleId: defaultRoleId });
+    for (const userId of userIds) {
+      await tx
+        .insert(courseEnrolments)
+        .values({ courseId, userId, roleId: defaultRoleId });
+    }
+
     await tx
       .update(courses)
-      .set({ memberCount: sql`member_count + 1` })
-      .where(eq(courses.id, newEnrolment.courseId));
+      .set({ memberCount: sql`member_count + ${userIds.length}` })
+      .where(eq(courses.id, courseId));
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);
@@ -61,10 +64,10 @@ export const updateCourseEnrolment = async (
 };
 
 export const deleteCourseEnrolment = async (
-  enrolmentIds: CourseEnrolmentId,
+  enrolmentId: CourseEnrolmentId,
   tx: DrizzleTransaction,
 ) => {
-  const { courseId, userId } = courseEnrolmentIdSchema.parse(enrolmentIds);
+  const { courseId, userId } = courseEnrolmentIdSchema.parse(enrolmentId);
   try {
     await tx
       .update(courses)
@@ -78,6 +81,34 @@ export const deleteCourseEnrolment = async (
           eq(courseEnrolments.courseId, courseId),
         ),
       );
+  } catch (err) {
+    const message = (err as Error).message ?? "Error, please try again";
+    console.error(message);
+    throw { error: message, message };
+  }
+};
+
+export const bulkDeleteCourseEnrolment = async (
+  enrolments: NewCourseEnrolmentParams,
+  tx: DrizzleTransaction,
+) => {
+  const { courseId, userIds } = insertCourseEnrolmentParams.parse(enrolments);
+  try {
+    for (const userId of userIds) {
+      await tx
+        .delete(courseEnrolments)
+        .where(
+          and(
+            eq(courseEnrolments.userId, userId),
+            eq(courseEnrolments.courseId, courseId),
+          ),
+        );
+    }
+
+    await tx
+      .update(courses)
+      .set({ memberCount: sql`member_count - ${userIds.length}` })
+      .where(eq(courses.id, courseId));
   } catch (err) {
     const message = (err as Error).message ?? "Error, please try again";
     console.error(message);

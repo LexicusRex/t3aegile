@@ -6,7 +6,6 @@ import {
 } from "@/server/actions/tutorials";
 import type { CourseParticipant } from "@/server/api/crud/course-enrolments/types";
 import type { TutorialCore } from "@/server/db/schema/tutorial";
-import { api } from "@/trpc/react";
 import type { Row } from "@tanstack/react-table";
 import { CheckIcon, EditIcon, MinusIcon, PlusIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -27,8 +26,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { FloatingAlert } from "@/components/forms/floating-alert";
 
 interface TutorialMultiSelectProps {
   courseId: string;
@@ -238,7 +235,7 @@ export function TutorialMultiSelect({
               </div>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">Select Tutorials</p>
+            <p className="text-xs text-muted-foreground">Select Tutorials</p>
           )}
         </Button>
       </PopoverTrigger>

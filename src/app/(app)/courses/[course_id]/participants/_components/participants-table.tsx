@@ -1,89 +1,8 @@
-// "use client";
-
-// import React from "react";
-
-// import type {
-//   CourseEnrollable,
-//   CourseParticipant,
-// } from "@/server/api/crud/course-enrolments/types";
-// import type { TutorialCore } from "@/server/db/schema/tutorial";
-
-// import type { DataTableFilterField } from "@/lib/types";
-// import { capitalize } from "@/lib/utils";
-// import { useDataTable } from "@/hooks/use-data-table";
-// import { DataTable } from "@/components/data-table/data-table";
-// import { DataTableToolbar } from "@/components/data-table/toolbar";
-
-// import { getColumns } from "./columns";
-// import { MembersTableToolbarActions } from "./participants-table-toolbar-actions";
-
-// interface MembersTableProps {
-//   members: CourseParticipant[];
-//   candidates: CourseEnrollable[];
-//   tutorials: TutorialCore[];
-//   hasRowActionPermission: boolean;
-//   hasToolbarActionPermission: boolean;
-//   roles?: { id: string; name: string }[];
-// }
-
-// export default function CourseParticipantsTable({
-//   members,
-//   candidates,
-//   tutorials,
-//   hasRowActionPermission,
-//   hasToolbarActionPermission,
-//   roles = [],
-// }: MembersTableProps) {
-//   const columns = React.useMemo(
-//     () => getColumns(hasRowActionPermission),
-//     [hasRowActionPermission],
-//   );
-//   const filterFields: DataTableFilterField<CourseParticipant>[] = [
-//     {
-//       label: "Email",
-//       value: "email",
-//       placeholder: "Filter email...",
-//     },
-//     {
-//       label: "Roles",
-//       value: "role",
-//       options: roles.map((role) => ({
-//         label: capitalize(role.name),
-//         value: role.name,
-//         withCount: true,
-//       })),
-//     },
-//     {
-//       label: "Tutorials",
-//       value: "tutorials",
-//       options: tutorials.map((tut) => ({
-//         label: capitalize(tut.name),
-//         value: tut.id,
-//         withCount: true,
-//       })),
-//     },
-//   ];
-
-//   const { table } = useDataTable({ data: members, columns });
-//   return (
-//     <DataTable table={table}>
-//       <DataTableToolbar table={table} filterFields={filterFields}>
-//         {hasToolbarActionPermission && (
-//           <MembersTableToolbarActions
-//             table={table}
-//             enrollableUsers={candidates}
-//             courseTutorials={tutorials}
-//           />
-//         )}
-//       </DataTableToolbar>
-//     </DataTable>
-//   );
-// }
-
 "use client";
 
 import * as React from "react";
 
+import { bulkDeleteCourseEnrolmentAction } from "@/server/actions/courseEnrolments";
 import type {
   CourseEnrollable,
   CourseParticipant,
@@ -96,6 +15,7 @@ import { useDataTable } from "@/hooks/use-fancy-data-table";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { DataTable } from "@/components/fancy-data-table/data-table";
+import { AlertDeleteDialog } from "@/components/forms/alert-delete-dialog";
 
 import { columns as baseColumns } from "./columns";
 import { generateFilterFields } from "./constants";
@@ -170,16 +90,36 @@ export default function CourseParticipantsTable({
               {/* Delete Section */}
               <div>
                 <h3 className="mb-2 text-sm">Delete Selected Rows</h3>
-                <Button
-                  variant="destructive"
-                  className="h-8 w-full border-red-500/20 bg-red-500/10 text-xs hover:bg-red-500/20 [&>*]:text-red-600 dark:[&>*]:text-red-400"
+                <AlertDeleteDialog
+                  itemType="participant"
+                  trigger={
+                    <Button
+                      variant="destructive"
+                      className="h-8 w-full border-red-500/20 bg-red-500/10 text-xs hover:bg-red-500/20 [&>*]:text-red-600 dark:[&>*]:text-red-400"
+                    >
+                      <Trash2 className="mr-1 h-3 w-3" />
+                      <p>
+                        Delete {table.getFilteredSelectedRowModel().rows.length}{" "}
+                        row(s)
+                      </p>
+                    </Button>
+                  }
                 >
-                  <Trash2 className="mr-1 h-3 w-3" />
-                  <p>
-                    Delete {table.getFilteredSelectedRowModel().rows.length}{" "}
-                    row(s)
-                  </p>
-                </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={async () => {
+                      const error = await bulkDeleteCourseEnrolmentAction({
+                        courseId,
+                        userIds: table
+                          .getFilteredSelectedRowModel()
+                          .rows.map((row) => row.original.id),
+                      });
+                      if (!error) table.resetRowSelection();
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </AlertDeleteDialog>
               </div>
 
               {canManageTutorialEnrolments && (

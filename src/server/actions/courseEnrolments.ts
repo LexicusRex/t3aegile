@@ -5,6 +5,7 @@ import "server-only";
 import { revalidatePath } from "next/cache";
 
 import {
+  bulkDeleteCourseEnrolment,
   createCourseEnrolment,
   deleteCourseEnrolment,
   updateCourseEnrolment,
@@ -51,6 +52,19 @@ export const deleteCourseEnrolmentAction = permissionProtectedAction(
     await withTransaction(async (tx) => {
       await deleteCourseEnrolment(payload, tx);
       // revalidateCourses();
+    });
+  },
+  (input) => input.courseId,
+  PERM_COURSE_MANAGE_ENROLMENTS,
+);
+
+export const bulkDeleteCourseEnrolmentAction = permissionProtectedAction(
+  async (input: NewCourseEnrolmentParams) => {
+    const payload = insertCourseEnrolmentParams.parse(input);
+    await withTransaction(async (tx) => {
+      await bulkDeleteCourseEnrolment(payload, tx);
+      // revalidateCourses();
+      revalidatePath(`/courses/${payload.courseId}/participants`);
     });
   },
   (input) => input.courseId,
