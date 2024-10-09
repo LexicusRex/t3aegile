@@ -71,7 +71,7 @@ export default function AssignmentTeamsDataTable({
         </p>
         <Separator className="my-4" />
         <div>
-          <h3 className="mb-2 text-sm">Enrol Course Participants</h3>
+          <h3 className="mb-2 text-sm">Create New Teams</h3>
           <GroupCreationDialog
             courseId={courseId}
             assignmentId={assignmentId}
@@ -94,14 +94,14 @@ function GroupCreationDialog({
       <DialogTrigger asChild>
         <Button variant="default" size="xs" className="mt-2 w-full text-xs">
           <PlusIcon className="mr-2 h-4 w-4" />
-          New Group
+          New Team
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[calc(100dvh-4rem)] overflow-y-auto sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create a new group</DialogTitle>
+          <DialogTitle>Create a new team</DialogTitle>
           <DialogDescription>
-            Intialise a new group with a corresponding identifier for tasks,
+            Intialise a new team with a corresponding identifier for tasks.
           </DialogDescription>
         </DialogHeader>
         <GroupForm courseId={courseId} assignmentId={assignmentId} />

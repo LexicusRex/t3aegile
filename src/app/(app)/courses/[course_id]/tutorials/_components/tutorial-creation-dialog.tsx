@@ -24,7 +24,7 @@ export default function TutorialCreationDialog() {
         <Button size="sm" className="h-7 gap-1">
           <PlusCircleIcon className="h-3.5 w-3.5" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            Create Course
+            New Tutorial
           </span>
         </Button>
       </DialogTrigger>
