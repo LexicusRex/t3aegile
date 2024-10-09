@@ -19,7 +19,7 @@ export const AlertDeleteDialog = ({
 }: {
   itemType: string;
   children: React.ReactNode;
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
 }) => {
   return (
     <AlertDialog>
