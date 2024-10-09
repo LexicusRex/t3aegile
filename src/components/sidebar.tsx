@@ -16,7 +16,7 @@ const Sidebar = async () => {
   if (session === null) return null;
   return (
     // <aside className="inset-y-0 left-0 z-20 hidden h-screen min-w-14 flex-col border-r bg-background shadow-inner md:block">
-    <aside className="fixed inset-y-0 left-0 z-20 hidden w-14 flex-col border-r bg-background sm:flex">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-14 flex-col border-r bg-background sm:flex">
       <TooltipProvider delayDuration={0}>
         <nav className="flex h-full flex-col items-center justify-between gap-4 px-2 sm:py-4">
           <div className="space-y-4">
