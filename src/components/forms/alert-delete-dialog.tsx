@@ -15,14 +15,20 @@ import { Button, buttonVariants } from "@/components/ui/button";
 export const AlertDeleteDialog = ({
   itemType,
   children,
+  trigger,
 }: {
   itemType: string;
   children: React.ReactNode;
+  trigger: React.ReactNode;
 }) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive">Delete {capitalize(itemType)}</Button>
+        {trigger ? (
+          trigger
+        ) : (
+          <Button variant="destructive">Delete {capitalize(itemType)}</Button>
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
