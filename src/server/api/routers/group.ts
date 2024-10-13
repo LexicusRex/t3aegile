@@ -60,16 +60,33 @@ export const groupRouter = createTRPCRouter({
           `.as("users"),
         })
         .from(groups)
-        .leftJoin(
+        .where(eq(groups.assignmentId, input.id))
+        .leftJoin(groupEnrolments, eq(groups.id, groupEnrolments.groupId))
+        .leftJoin(users, eq(groupEnrolments.userId, users.id))
+        .groupBy(groups.id);
+      return { teams: rows };
+    }),
+
+  getAuthUserEnrolledGroup: protectedProcedure
+    .input(assignmentIdSchema)
+    .query(async ({ ctx, input }) => {
+      const rows = await ctx.db
+        .select({
+          id: groups.id,
+          name: groups.name,
+          identifier: groups.identifier,
+        })
+        .from(groups)
+        .innerJoin(
           groupEnrolments,
           and(
             eq(groups.assignmentId, input.id),
             eq(groups.id, groupEnrolments.groupId),
           ),
         )
-        .leftJoin(users, eq(groupEnrolments.userId, users.id))
-        .groupBy(groups.id);
-      return { teams: rows };
+        .where(eq(groupEnrolments.userId, ctx.session.user.id))
+        .limit(1);
+      return { team: rows[0] };
     }),
 
   create: permissionProtectedProcedure(PERM_GROUP_MANAGE_CORE)
