@@ -7,6 +7,7 @@ import { timestamps } from "@/lib/utils";
 
 import { assignments } from "./assignment";
 import { ID_LENGTH } from "./config";
+import { courses } from "./course";
 import { createTable, generateId } from "./util";
 
 /**
@@ -25,6 +26,12 @@ export const groups = createTable(
       .notNull()
       .primaryKey()
       .$defaultFn(() => generateId("grp")),
+    courseId: varchar("course_id", { length: ID_LENGTH })
+      .notNull()
+      .references(() => courses.id, {
+        onUpdate: "no action",
+        onDelete: "cascade",
+      }),
     assignmentId: varchar("assignment_id", { length: ID_LENGTH })
       .notNull()
       .references(() => assignments.id, {
@@ -50,14 +57,17 @@ export const groups = createTable(
       .$onUpdate(() => new Date()),
   },
   (t) => ({
-    uniqueGroupName: unique().on(t.assignmentId, t.name),
-    uniqueGroupIdentifier: unique().on(t.assignmentId, t.identifier),
+    uniqueAssignmentGroupName: unique().on(t.assignmentId, t.name),
+    uniqueAssignmentGroupIdentifier: unique().on(t.assignmentId, t.identifier),
+    uniqueCourseGroupName: unique().on(t.courseId, t.name),
+    uniqueCourseGroupIdentifier: unique().on(t.courseId, t.identifier),
   }),
 );
 
 const baseSchema = createSelectSchema(groups).omit(timestamps);
 
 const zodGroupSchemaExtension = {
+  courseId: z.string().length(ID_LENGTH, "Invalid course ID"),
   assignmentId: z.string().length(ID_LENGTH, "Invalid assignment ID"),
   name: z.string().min(3, "Group name must be at least 3 characters."),
   identifier: z
