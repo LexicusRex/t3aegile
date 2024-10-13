@@ -32,7 +32,7 @@ export default function AssignmentTeamsAndMembersCard({
 }) {
   return (
     <Card className="col-span-1 w-full shrink-0 bg-background/80 shadow-none">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pt-6">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 text-sm">
         <CardTitle>Teams & Members</CardTitle>
       </CardHeader>
       <CardContent>
@@ -83,7 +83,7 @@ function AssignmentMembersDataTableDialog({
           Manage
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex h-full max-h-[calc(100%-4rem)] w-[calc(100%-4rem)] flex-col overflow-y-auto">
+      <DialogContent className="flex h-full max-h-[calc(100%-4rem)] w-[calc(100%-8rem)] flex-col overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Assessable Members</DialogTitle>
           <DialogDescription>
@@ -123,7 +123,7 @@ function AssignmentTeamsDataTableDialog({
           Manage
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex h-full max-h-[calc(100%-4rem)] w-[calc(100%-4rem)] flex-col items-start overflow-y-auto">
+      <DialogContent className="flex h-full max-h-[calc(100%-4rem)] w-[calc(100%-8rem)] flex-col items-start overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Assessable Teams</DialogTitle>
           <DialogDescription>

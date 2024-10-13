@@ -13,7 +13,7 @@ export default async function AssignmentPropertiesCard({
 }) {
   return (
     <Card className="col-span-1 w-full shrink-0 bg-background/80 shadow-none">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pt-6">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 text-sm">
         <CardTitle>Properties</CardTitle>
       </CardHeader>
       <CardContent>
