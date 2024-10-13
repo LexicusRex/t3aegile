@@ -333,6 +333,10 @@ export function TutorialMultiSelect({
               </code>
             </pre>,
           );
+          await bulkDeleteTutorialEnrolmentAction({
+            courseId,
+            enrolments: removed,
+          });
           const insertError = await bulkInsertTutorialEnrolmentAction({
             courseId,
             enrolments: added,
@@ -344,10 +348,6 @@ export function TutorialMultiSelect({
               })
             : toast.success(`Enrolled successfully!`);
 
-          await bulkDeleteTutorialEnrolmentAction({
-            courseId,
-            enrolments: removed,
-          });
           // Here you would typically call an API to update the tutorials
           setIsDirty(false);
         }}
