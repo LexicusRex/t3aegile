@@ -75,6 +75,10 @@ export default async function AssignmentPage({
   })) as { teams: Team[] };
   // if assignment is inactive and user doesn't have permission to view inactive assignments, use the Protect component
 
+  const { team } = await api.group.getAuthUserEnrolledGroup({
+    id: assignmentId,
+  });
+
   const isActive =
     assignment.availableAt && assignment.availableAt < new Date();
 
@@ -117,6 +121,16 @@ export default async function AssignmentPage({
           </Card>
         </div>
         <div className="order-first col-span-2 grid grid-cols-2 flex-col gap-4 self-start xl:order-last xl:col-span-1 xl:flex">
+          {team && (
+            <Card className="w-full shrink-0 bg-background/80 shadow-none">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pt-6 text-sm">
+                <CardTitle>My Team</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {team?.name} {team?.identifier}
+              </CardContent>
+            </Card>
+          )}
           <AssignmentPropertiesCard assignment={assignment} />
           <AssignmentDeliverablesCard
             courseId={courseId}
