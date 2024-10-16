@@ -57,6 +57,7 @@ export function GroupForm({
     resolver: zodResolver(editing ? updateGroupSchema : insertGroupSchema),
     defaultValues: {
       ...group,
+      courseId,
       assignmentId,
       name: group?.name ?? "",
       identifier: group?.identifier ?? "",
@@ -70,7 +71,7 @@ export function GroupForm({
     if (identifier === "" || identifier === name.slice(0, 3).toUpperCase()) {
       const newIdentifier = newName.slice(0, 3).toUpperCase();
       setIdentifier(newIdentifier);
-      form.setValue("identifier", e.target.value.toUpperCase());
+      form.setValue("identifier", newIdentifier.toUpperCase());
     }
   };
   function onSubmit(data: NewGroupFormValues) {
@@ -81,7 +82,7 @@ export function GroupForm({
     );
 
     startMutation(async () => {
-      const error = await createGroupAction({ courseId, ...data });
+      const error = await createGroupAction(data);
       if (error) {
         toast.error(`Failed to create`, {
           description: error ?? "Error",
@@ -94,9 +95,29 @@ export function GroupForm({
     });
   }
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const isValid = await form.trigger();
+    if (isValid) {
+      await form.handleSubmit(onSubmit)(e);
+    } else {
+      // Form is invalid, show an error toast
+      toast.error(
+        <div>
+          <p>Form Submission Failed</p>
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">
+              {JSON.stringify(form.formState.errors, null, 2)}
+            </code>
+          </pre>
+        </div>,
+      );
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField
             control={form.control}
