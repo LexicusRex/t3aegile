@@ -94,7 +94,19 @@ export const Icons = {
     </svg>
   ),
   twitter: Twitter,
-  check: Check,
+  // check: Check,
+  check: ({ ...props }: LucideProps) => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="#5e5e5f"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M6.336 13.6a1.049 1.049 0 0 1-.8-.376L2.632 9.736a.992.992 0 0 1 .152-1.424 1.056 1.056 0 0 1 1.456.152l2.008 2.4 5.448-8a1.048 1.048 0 0 1 1.432-.288A.992.992 0 0 1 13.424 4L7.2 13.144a1.04 1.04 0 0 1-.8.456h-.064Z" />
+    </svg>
+  ),
   home: HomeIcon,
   class: SchoolIcon,
   users: UsersIcon,
@@ -103,4 +115,29 @@ export const Icons = {
   group: PyramidIcon,
   kanban: SquareKanbanIcon,
   chart: ChartNoAxesCombinedIcon,
+  unassigned: ({ ...props }: LucideProps) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M10.1 2.182a10 10 0 0 1 3.8 0" />
+      <path d="M13.9 21.818a10 10 0 0 1-3.8 0" />
+      <path d="M17.609 3.721a10 10 0 0 1 2.69 2.7" />
+      <path d="M2.182 13.9a10 10 0 0 1 0-3.8" />
+      <path d="M20.279 17.609a10 10 0 0 1-2.7 2.69" />
+      <path d="M21.818 10.1a10 10 0 0 1 0 3.8" />
+      <path d="M3.721 6.391a10 10 0 0 1 2.7-2.69" />
+      <path d="M6.391 20.279a10 10 0 0 1-2.69-2.7" />
+      <circle cx="12" cy="10" r="3" />
+      <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+    </svg>
+  ),
 };
