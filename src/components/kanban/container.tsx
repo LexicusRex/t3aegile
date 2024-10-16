@@ -15,7 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import GroupDragOverlay from "../fancy-kanban/group-drag-overlay";
+import GroupDragOverlay from "./group-drag-overlay";
 
 // import { TaskCreationDialog } from "@/components/aegile/task-creation-dialog";
 
