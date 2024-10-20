@@ -40,7 +40,7 @@ export default function BreadcrumbPath() {
   // No more that 3 explicit paths.
   // show very first, and the last two, everything in between is collapsed with a dropdown
   return (
-    <Breadcrumb className="hidden md:flex">
+    <Breadcrumb className="flex">
       <BreadcrumbList>
         {breadcrumbPaths.slice(0, 1).map((path) => (
           <React.Fragment key={0}>
