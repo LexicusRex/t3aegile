@@ -52,6 +52,16 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -60,22 +70,42 @@ const config = {
       },
       keyframes: {
         "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
         },
         "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
         },
         shake: {
-          "10%, 90%": { transform: "translate3d(-1px, 0, 0)" },
-          "20%, 80%": { transform: "translate3d(2px, 0, 0)" },
-          "30%, 50%, 70%": { transform: "translate3d(-4px, 0, 0)" },
-          "40%, 60%": { transform: "translate3d(4px, 0, 0)" },
+          "10%, 90%": {
+            transform: "translate3d(-1px, 0, 0)",
+          },
+          "20%, 80%": {
+            transform: "translate3d(2px, 0, 0)",
+          },
+          "30%, 50%, 70%": {
+            transform: "translate3d(-4px, 0, 0)",
+          },
+          "40%, 60%": {
+            transform: "translate3d(4px, 0, 0)",
+          },
         },
         shine: {
-          from: { backgroundPosition: "200% 0" },
-          to: { backgroundPosition: "-200% 0" },
+          from: {
+            backgroundPosition: "200% 0",
+          },
+          to: {
+            backgroundPosition: "-200% 0",
+          },
         },
       },
       animation: {
