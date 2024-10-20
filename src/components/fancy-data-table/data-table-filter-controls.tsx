@@ -60,7 +60,7 @@ export function DataTableFilterControls<TData, TValue>({
           {filters.length ? (
             <Button
               variant="ghost"
-              size="xs"
+              size="sm"
               className="h-7 p-2 text-xs"
               onClick={() => {
                 table.resetColumnFilters();

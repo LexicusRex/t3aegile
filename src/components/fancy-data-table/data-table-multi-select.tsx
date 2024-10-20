@@ -175,7 +175,7 @@ export function DataTableMultiSelect<TSchema>({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          size="xs"
+          size="sm"
           className="flex h-fit min-h-8 w-full items-center py-2"
           disabled={isDisabled}
         >
