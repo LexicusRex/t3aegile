@@ -25,7 +25,7 @@ export function EnrolParticipantsDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default" size="xs" className="mt-2 w-full text-xs">
+        <Button variant="default" size="sm" className="mt-2 w-full text-xs">
           <PlusIcon className="mr-2 h-4 w-4" />
           Enrol Participants
         </Button>

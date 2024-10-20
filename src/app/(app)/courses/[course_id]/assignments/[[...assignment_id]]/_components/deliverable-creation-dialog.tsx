@@ -35,7 +35,7 @@ export default function DeliverableCreationDialog({
             New
           </span>
           </Button> */}
-        <Button size="xs" className="w-full text-sm">
+        <Button size="sm" className="w-full text-sm">
           <PlusIcon className="mr-1 h-4 w-4" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
             New Deliverable

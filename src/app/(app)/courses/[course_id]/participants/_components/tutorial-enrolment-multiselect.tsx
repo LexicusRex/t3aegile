@@ -181,7 +181,7 @@ export function TutorialMultiSelect({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          size="xs"
+          size="sm"
           className="flex h-fit min-h-8 w-full items-center py-3"
         >
           {currentlySelected.length > 0 ? (

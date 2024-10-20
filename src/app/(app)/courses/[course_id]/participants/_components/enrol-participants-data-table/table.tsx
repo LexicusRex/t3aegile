@@ -63,7 +63,7 @@ export function EnrollableParticipantsDataTable({
                 Bulk enrol selected users into the course.
               </p>
               <Button
-                size="xs"
+                size="sm"
                 className="w-full text-xs"
                 disabled={pending}
                 onClick={() =>

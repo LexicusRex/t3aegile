@@ -72,9 +72,9 @@ export default function DeliverableCard({
         <Button
           size="sm"
           asChild
-          variant="expandIcon"
-          Icon={ArrowRightIcon}
-          iconPlacement="left"
+          // variant="expandIcon"
+          // Icon={ArrowRightIcon}
+          // iconPlacement="left"
         >
           <Link href={`/deliverables/${id}`}>View</Link>
         </Button>
