@@ -16,7 +16,7 @@ export const revalidate = 0;
 
 export default async function CoursesPage() {
   return (
-    <main className="flex flex-1 flex-col space-y-5 border border-red-500 p-4 sm:px-6">
+    <main className="flex flex-1 flex-col space-y-5 p-4 sm:px-6">
       <div className="mb-3 space-y-2">
         <h3 className="font-semibold leading-none tracking-tight">Courses</h3>
         <p className="text-sm text-muted-foreground">
@@ -36,7 +36,6 @@ const Courses = async () => {
   const { courses } = session?.user.isSuperuser
     ? await getCourses()
     : await getCoursesByEnrolment(session?.user.id);
-  // console.log("🚀 ~ Courses ~ courses:", courses);
   const isSuperuser = session?.user.isSuperuser;
 
   return courses.length === 0 ? (
