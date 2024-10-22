@@ -1,6 +1,6 @@
-import type { TIssueAssignee } from "./types.ts";
+import type { TTaskAssignee } from "./types.ts";
 
-export const assignees: TIssueAssignee[] = [
+export const assignees: TTaskAssignee[] = [
   {
     id: "lexicusrex",
     name: "lexicusrex",

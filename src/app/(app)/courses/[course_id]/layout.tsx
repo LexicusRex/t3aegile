@@ -36,9 +36,7 @@ export default async function CourseLayout({
         isMember={isCourseMember}
       >
         <>{navbar}</>
-        <main className="flex flex-1 flex-col p-4 pt-6 md:px-10">
-          {children}
-        </main>
+        <main className="flex flex-1 flex-col p-4 pt-6">{children}</main>
       </Protect>
     </div>
   );

@@ -16,6 +16,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Kbd } from "@/components/ui/kbd";
 import {
   Popover,
   PopoverContent,
@@ -28,9 +29,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Icons } from "@/components/icons";
 
-import { Kbd } from "@/components/ui/kbd";
 import { assignees } from "./data";
-import type { TIssueAssignee } from "./types";
+import type { TTaskAssignee } from "./types";
 
 export const AssigneeCombobox = ({
   isActive,
@@ -45,7 +45,7 @@ export const AssigneeCombobox = ({
   const [openTooltip, setOpenTooltip] = React.useState(false);
 
   const [selectedAssignee, setSelectedAssignee] = React.useState<
-    TIssueAssignee | undefined
+    TTaskAssignee | undefined
   >(undefined);
 
   const [searchValue, setSearchValue] = React.useState("");

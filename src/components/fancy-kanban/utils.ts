@@ -102,7 +102,7 @@ export const getDestinationFromDropPayload = (
       destinationColumnData = dropTargetData;
     }
 
-    if (dropTargetData.type === "ISSUE") {
+    if (dropTargetData.type === "TASK") {
       destinationTaskData = dropTargetData;
     }
   }

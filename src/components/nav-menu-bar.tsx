@@ -39,7 +39,7 @@ export function NavMenuBar({
   return (
     // <nav className="-mb-px hidden flex-col gap-6 px-4 text-lg font-medium sm:flex sm:flex-row sm:items-center sm:gap-5 sm:px-6 sm:text-sm lg:gap-6">
     // <nav className="sticky top-0 z-10 -mb-px hidden px-4 text-sm font-medium leading-5 backdrop-blur-3xl sm:flex sm:border-b">
-    <nav className="sticky top-0 z-20 -mb-px flex border-b bg-background px-4 text-sm font-medium leading-5">
+    <nav className="sticky top-0 z-20 -mb-px flex border-b bg-background px-2 text-sm font-medium leading-5">
       {/* <Link
         href={`/${route}/${page_id}`}
         key={page_id}
@@ -60,7 +60,7 @@ export function NavMenuBar({
                 <Link
                   href={`/${route}/${page_id}/${link.href}`}
                   className={cn(
-                    "relative flex items-center p-3 transition-colors hover:text-foreground",
+                    "relative flex items-center p-2 py-3 transition-colors hover:text-foreground",
                     path === link.href
                       ? "text-foreground"
                       : "text-muted-foreground",

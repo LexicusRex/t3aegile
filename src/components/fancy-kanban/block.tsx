@@ -59,7 +59,7 @@ export default function KanbanTaskBlock(props: TaskBlockProps) {
         dragHandle: element,
         // canDrag: () => isDragAllowed,
         canDrag: () => true,
-        getInitialData: () => ({ id: taskId, type: "ISSUE" }),
+        getInitialData: () => ({ id: taskId, type: "TASK" }),
         onDragStart: () => {
           setIsCurrentBlockDragging(true);
           // setIsKanbanDragging(true);
@@ -72,7 +72,7 @@ export default function KanbanTaskBlock(props: TaskBlockProps) {
       dropTargetForElements({
         element,
         canDrop: ({ source }) => source?.data?.id !== taskId && canDropOverTask,
-        getData: () => ({ id: taskId, type: "ISSUE" }),
+        getData: () => ({ id: taskId, type: "TASK" }),
         onDragEnter: (args) => {
           setIsDraggingOverBlock(true);
           // console.log("onDragEnter", args);
