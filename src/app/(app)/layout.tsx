@@ -24,11 +24,11 @@ export default async function AppLayout({
     return <CheckAuth />;
   } else {
     return (
-      <div className="flex min-h-screen flex-col">
+      <div className="flex h-screen flex-col">
         <SidebarProvider>
           <AppSidebar />
-          <SidebarInset>
-            <header className="sticky top-0 z-20 flex h-auto shrink-0 items-center gap-2 bg-background px-4 py-px pt-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 sm:static sm:bg-transparent">
+          <SidebarInset className="overflow-x-hidden">
+            <header className="sticky -top-full z-20 flex h-auto shrink-0 items-center gap-2 bg-background px-4 py-px pt-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 sm:static sm:bg-transparent">
               <div className="flex w-full items-center gap-2">
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
